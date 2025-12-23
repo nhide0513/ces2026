@@ -127,14 +127,21 @@
         const imageHeight = 5950;
         
         // PDF座標 → Leaflet座標への変換関数
+        // ⚠️ 重要: ExcelのPDF座標はLetter Size（792×612pt）基準
+        // 実際のPDFは 945×714pt なので、スケール補正が必要
         function pdfToLeaflet(pdfX, pdfY) {
-            // PDF: 72 DPI → PNG: 600 DPI
-            const scale = 600 / 72;
-            const pngX = pdfX * scale;
-            const pngY = pdfY * scale;
+            // ステップ1: Letter Size → 実際のPDFサイズに補正
+            const scaleX = 945 / 792;  // 1.1932
+            const scaleY = 714 / 612;  // 1.1667
+            const adjustedX = pdfX * scaleX;
+            const adjustedY = pdfY * scaleY;
             
-            // ⚠️ 重要: PDFは左上原点、Leaflet Simple CRSは左下原点
-            // そのためY軸を反転させる必要がある
+            // ステップ2: PDF → PNG (600 DPI)
+            const scale = 600 / 72;
+            const pngX = adjustedX * scale;
+            const pngY = adjustedY * scale;
+            
+            // ステップ3: Y軸反転（Leaflet Simple CRS要件）
             const leafletLat = imageHeight - pngY;
             const leafletLng = pngX;
             
