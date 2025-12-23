@@ -154,7 +154,7 @@
             L.latLng(imageHeight, imageWidth)
         );
         
-        L.imageOverlay('page_11.png', bounds).addTo(map);
+        L.imageOverlay('./page_11.png', bounds).addTo(map);
         map.fitBounds(bounds);
         
         // マーカー用のレイヤーグループ
@@ -220,7 +220,7 @@
         // CSVデータの読み込みと処理
         console.log('📂 CSVデータ読み込み開始...');
         
-        Papa.parse('CES2026_page11_coordinates.csv', {
+        Papa.parse('./CES2026_page11_coordinates.csv', {
             download: true,
             header: true,
             skipEmptyLines: true,
