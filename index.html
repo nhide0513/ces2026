@@ -122,7 +122,7 @@
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     
     <script>
-        // 画像サイズ（実測値: 7875 × 5950）
+        // 画像サイズ（実測値: 7875 × 5950、600 DPI）
         const imageWidth = 7875;
         const imageHeight = 5950;
         
@@ -133,7 +133,8 @@
             const pngX = pdfX * scale;
             const pngY = pdfY * scale;
             
-            // ⚠️ 重要: Y軸反転（Leaflet Simple CRSの要件）
+            // ⚠️ 重要: PDFは左上原点、Leaflet Simple CRSは左下原点
+            // そのためY軸を反転させる必要がある
             const leafletLat = imageHeight - pngY;
             const leafletLng = pngX;
             
