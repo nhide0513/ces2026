@@ -122,9 +122,9 @@
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     
     <script>
-        // 画像サイズ（実測値: 7875 × 5950、600 DPI）
-        const imageWidth = 7875;
-        const imageHeight = 5950;
+        // 画像サイズ（900 DPI、高解像度版）
+        const imageWidth = 11813;
+        const imageHeight = 8925;
         
         // PDF座標 → Leaflet座標への変換関数
         // ⚠️ 重要: ExcelのPDF座標はLetter Size（792×612pt）基準
@@ -136,8 +136,8 @@
             const adjustedX = pdfX * scaleX;
             const adjustedY = pdfY * scaleY;
             
-            // ステップ2: PDF → PNG (600 DPI)
-            const scale = 600 / 72;
+            // ステップ2: PDF → PNG (900 DPI)
+            const scale = 900 / 72;  // 600 DPIから900 DPIに変更
             const pngX = adjustedX * scale;
             const pngY = adjustedY * scale;
             
@@ -151,8 +151,8 @@
         // 地図の初期化
         const map = L.map('map', {
             crs: L.CRS.Simple,
-            minZoom: -1,
-            maxZoom: 3,
+            minZoom: -2,      // より縮小可能に（-1 → -2）
+            maxZoom: 4,       // より拡大可能に（3 → 4）
             zoomControl: true
         });
         
