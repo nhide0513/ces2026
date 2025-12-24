@@ -208,7 +208,7 @@
         <p style="font-size: 0.8rem; color: #888; margin-top: 0.5rem;">ページ11の企業を表示します</p>
     </div>
     
-    <div class="debug-panel" id="debugPanel">
+    <div class="debug-panel hidden" id="debugPanel">
         <div id="debugLog"></div>
     </div>
 
@@ -216,31 +216,36 @@
     // ============================================
     // CES 2026 地図機能 - Step 2
     // Leaflet.js + CSV座標データ
+    // 高解像度版（1200 DPI）
     // ============================================
     
     // 定数
     const CONFIG = {
-        // 画像サイズ（現在の低解像度版）
-        IMAGE_WIDTH: 1260,
-        IMAGE_HEIGHT: 952,
+        // 画像サイズ（1200 DPI 高解像度版）
+        IMAGE_WIDTH: 13201,
+        IMAGE_HEIGHT: 10200,
         
-        // PDF座標系
+        // PDF座標系（pdfplumberで取得）
         PDF_WIDTH: 792,
         PDF_HEIGHT: 612,
+        
+        // DPI設定
+        DPI: 1200,
         
         // 対象ページ
         TARGET_PAGE: 11,
         
-        // 画像パス（GitHub Pages: /ces2026/ces/ ディレクトリ）
-        IMAGE_PATH: './page_11.png',
+        // 画像パス
+        IMAGE_PATH: './page_11_1200dpi.png',
         
-        // CSVパス（同じディレクトリ）
-        CSV_PATH: './coordinates.csv'
+        // CSVパス
+        CSV_PATH: './CES2026_最終座標データ.csv'
     };
     
-    // スケール計算
-    const SCALE_X = CONFIG.IMAGE_WIDTH / CONFIG.PDF_WIDTH;
-    const SCALE_Y = CONFIG.IMAGE_HEIGHT / CONFIG.PDF_HEIGHT;
+    // スケール計算（シンプル版）
+    // PDF座標（792x612 pt）→ PNG座標（13201x10200 px）
+    // 変換係数: 1200 DPI / 72 pt = 16.667
+    const PDF_TO_PNG_SCALE = CONFIG.DPI / 72;  // 16.667
     
     // グローバル変数
     let map = null;
@@ -259,13 +264,13 @@
         }
     }
     
-    // PDF座標 → Leaflet座標に変換
-    function pdfToLeaflet(pdfX, pdfY) {
-        // 1. PDF座標をPNG座標に変換
-        const pngX = pdfX * SCALE_X;
-        const pngY = pdfY * SCALE_Y;
+    // CSV座標（PDF座標 792x612基準）→ Leaflet座標に変換
+    function csvToLeaflet(pdfX, pdfY) {
+        // PDF座標をPNG座標に変換（DPI変換）
+        const pngX = pdfX * PDF_TO_PNG_SCALE;
+        const pngY = pdfY * PDF_TO_PNG_SCALE;
         
-        // 2. Y軸を反転（Leaflet Simple CRSは左上原点）
+        // Y軸を反転（Leaflet Simple CRSは左上原点、PDFは左下原点）
         const leafletLat = CONFIG.IMAGE_HEIGHT - pngY;
         const leafletLng = pngX;
         
@@ -280,7 +285,7 @@
         map = L.map('map', {
             crs: L.CRS.Simple,
             minZoom: -2,
-            maxZoom: 3,
+            maxZoom: 4,
             zoomSnap: 0.25,
             zoomDelta: 0.5
         });
@@ -371,8 +376,8 @@
         markers = [];
         
         companies.forEach(company => {
-            // PDF座標をLeaflet座標に変換
-            const [lat, lng] = pdfToLeaflet(company.pdfX, company.pdfY);
+            // CSV座標をLeaflet座標に変換
+            const [lat, lng] = csvToLeaflet(company.pdfX, company.pdfY);
             
             // カスタムアイコン（円形）
             const icon = L.divIcon({
@@ -445,7 +450,7 @@
     
     // 初期化
     async function init() {
-        debugLog('=== Step 2 Initialization ===');
+        debugLog('=== Step 2 Initialization (1200 DPI) ===');
         
         try {
             // マップ初期化
@@ -467,11 +472,6 @@
             });
             
             debugLog('=== Initialization Complete ===');
-            
-            // 3秒後にデバッグパネルを非表示
-            setTimeout(() => {
-                document.getElementById('debugPanel').classList.add('hidden');
-            }, 5000);
             
         } catch (error) {
             debugLog('ERROR: ' + error.message);
