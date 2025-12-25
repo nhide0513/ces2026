@@ -249,11 +249,11 @@ function highlightCompanyOnMap(companyIndex) {
     }
     
     // ★ここから追加
-    const companyPage = parseFloat(company.pdfPage);
-    if (companyPage !== currentMapPage) {
+//    const companyPage = parseFloat(company.pdfPage);
+//    if (companyPage !== currentMapPage) {
         // ページが異なる場合は切り替える
-        switchMapPage(companyPage);
-    }
+//        switchMapPage(companyPage);
+//    }
     // ★ここまで追加
     
     const pdfPage = parseFloat(company.pdfPage);
