@@ -536,15 +536,16 @@ function findCompaniesAtLocation(lat, lng) {
     return result;
 }
 
-// パネル外クリックで閉じる
+// パネル外クリックで閉じる（修正版）
 document.addEventListener('click', function(e) {
     const panel = document.getElementById('mapInfoPanel');
     if (panel && panel.classList.contains('visible')) {
-        // クリックがパネル外かつマーカー外の場合
-        if (!panel.contains(e.target) && !e.target.closest('.leaflet-marker-icon')) {
+        // クリックがパネル外の場合のみ
+        if (!panel.contains(e.target) && 
+            !e.target.closest('.leaflet-interactive')) {  // ← これに変更
             closeMapPanel();
         }
     }
-});
+}, true);  // ← キャプチャフェーズで実行
 
 console.log('✓ map.js v1.6 読み込み完了');
