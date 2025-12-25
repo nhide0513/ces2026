@@ -38,8 +38,10 @@ const PDF_HEIGHT = 612;
  * @returns {Array} [lat, lng] - Leafletパーセント座標 (0-100)
  */
 function pdfToLeaflet(pdfX, pdfY) {
-    const lat = (parseFloat(pdfY) / PDF_HEIGHT) * 100;
-    const lng = (parseFloat(pdfX) / PDF_WIDTH) * 100;
+    const percentY = (parseFloat(pdfY) / 612) * 100;
+    const percentX = (parseFloat(pdfX) / 792) * 100;
+    const lat = 100 - percentY;  // Y軸反転
+    const lng = percentX;
     return [lat, lng];
 }
 
