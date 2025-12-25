@@ -85,6 +85,7 @@ function initMap() {
     
     // 地図の初期表示位置を設定
     map.fitBounds(bounds);
+    map.setZoom(0);  // ← この行を追加（0が適度な拡大、必要に応じて調整）
     
     console.log('✓ 地図初期化完了');
 }
