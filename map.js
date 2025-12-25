@@ -128,17 +128,19 @@ function displayMapMarkers(companies) {
             });
             
             // マーカークリック時にパネルを表示（v1.6変更）
-            marker.on('click', function() {
-                const [lat, lng] = pdfToLeaflet(pdfX, pdfY);
-                const companiesAtLocation = findCompaniesAtLocation(lat, lng);
-                showMapPanel(companiesAtLocation);
-                
-                // クリックされたマーカーを赤色に
-                markers.forEach(m => {
-                    m.setStyle({fillColor: '#3b82f6', color: '#ffffff'});
-                });
-                marker.setStyle({fillColor: '#ff0000', color: '#ffffff'});
-            });
+marker.on('click', function() {
+    console.log('マーカーがクリックされました'); // ← この行を追加
+    const [lat, lng] = pdfToLeaflet(pdfX, pdfY);
+    const companiesAtLocation = findCompaniesAtLocation(lat, lng);
+    console.log('見つかった企業数:', companiesAtLocation.length); // ← この行を追加
+    showMapPanel(companiesAtLocation);
+    
+    // クリックされたマーカーを赤色に
+    markers.forEach(m => {
+        m.setStyle({fillColor: '#3b82f6', color: '#ffffff'});
+    });
+    marker.setStyle({fillColor: '#ff0000', color: '#ffffff'});
+});
             
             // マーカーを地図に追加
             marker.addTo(map);
