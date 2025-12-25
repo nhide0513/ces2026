@@ -5,7 +5,7 @@ let companies = [];
 let visitedStatus = {};
 let likedStatus = {};
 let statusFilter = 'all';
-let venueFilters = new Set(['all']);
+let pageFilters = new Set(['all']);  // ← v1.5変更: venueFilters → pageFilters
 let priorityFilters = new Set(['candidate']);
 let likeFilters = new Set(['all']);
 let searchQuery = '';
@@ -124,7 +124,7 @@ function saveSettings() {
     try {
         const settings = {
             statusFilter: statusFilter,
-            venueFilters: Array.from(venueFilters),
+            pageFilters: Array.from(pageFilters),  // ← v1.5変更
             priorityFilters: Array.from(priorityFilters),
             likeFilters: Array.from(likeFilters),
             searchQuery: searchQuery,
@@ -143,7 +143,7 @@ function loadSettings() {
         if (data) {
             const settings = JSON.parse(data);
             statusFilter = settings.statusFilter || 'all';
-            venueFilters = new Set(settings.venueFilters || ['all']);
+            pageFilters = new Set(settings.pageFilters || ['all']);  // ← v1.5変更
             priorityFilters = new Set(settings.priorityFilters || ['candidate']);
             likeFilters = new Set(settings.likeFilters || ['all']);
             searchQuery = settings.searchQuery || '';
@@ -172,8 +172,10 @@ function getFilteredCompanies() {
         if (statusFilter === 'visited' && !visitedStatus[company.name]) return false;
         if (statusFilter === 'unvisited' && visitedStatus[company.name]) return false;
         
-        if (!venueFilters.has('all') && venueFilters.size > 0) {
-            if (!venueFilters.has(company.venue)) return false;
+        // ← v1.5変更: ページ番号ベースのフィルタ
+        if (!pageFilters.has('all') && pageFilters.size > 0) {
+            const pageStr = String(Math.floor(parseFloat(company.pdfPage)));
+            if (!pageFilters.has(pageStr)) return false;
         }
         
         if (!priorityFilters.has('all') && !priorityFilters.has('candidate') && priorityFilters.size > 0) {
@@ -241,10 +243,13 @@ function renderCompanyList() {
         const escapedName = company.name.replace(/'/g, "\\'");
         const index = companies.indexOf(company);
         
+        // ← v1.5変更: 会場名をページ番号から取得
+        const venueName = getVenueName(company.pdfPage);
+        
         html += '<div class="company-card ' + (visited ? 'visited' : '') + '">';
         html += '<div class="company-header"><div class="company-name">' + company.name + '</div></div>';
         if (badges) html += '<div class="badges">' + badges + '</div>';
-        html += '<div class="company-info">📍 ' + (company.venue || '未定');
+        html += '<div class="company-info">📍 ' + venueName;
         if (company.booth) html += ' | ブース ' + company.booth;
         html += '</div>';
         
@@ -378,31 +383,31 @@ function setupFilterEvents() {
         });
     });
     
-    // 会場フィルター
-    document.querySelectorAll('#venueFilters .chip').forEach(btn => {
+    // ← v1.5変更: ページフィルター
+    document.querySelectorAll('#pageFilters .chip').forEach(btn => {
         btn.addEventListener('click', function() {
-            const venue = this.dataset.venue;
+            const page = this.dataset.page;
             
-            if (venue === 'all') {
-                venueFilters.clear();
-                venueFilters.add('all');
+            if (page === 'all') {
+                pageFilters.clear();
+                pageFilters.add('all');
             } else {
-                venueFilters.delete('all');
-                if (venueFilters.has(venue)) {
-                    venueFilters.delete(venue);
+                pageFilters.delete('all');
+                if (pageFilters.has(page)) {
+                    pageFilters.delete(page);
                 } else {
-                    venueFilters.add(venue);
+                    pageFilters.add(page);
                 }
-                if (venueFilters.size === 0) {
-                    venueFilters.add('all');
+                if (pageFilters.size === 0) {
+                    pageFilters.add('all');
                 }
             }
             
-            document.querySelectorAll('#venueFilters .chip').forEach(b => {
-                if (b.dataset.venue === 'all') {
-                    b.classList.toggle('active', venueFilters.has('all'));
+            document.querySelectorAll('#pageFilters .chip').forEach(b => {
+                if (b.dataset.page === 'all') {
+                    b.classList.toggle('active', pageFilters.has('all'));
                 } else {
-                    b.classList.toggle('active', venueFilters.has(b.dataset.venue));
+                    b.classList.toggle('active', pageFilters.has(b.dataset.page));
                 }
             });
             
@@ -490,13 +495,13 @@ async function init() {
     // スプレッドシート同期
     await loadFromAppsScript();
     
-    // フィルター状態復元
-    if (settings && venueFilters.size > 0) {
-        document.querySelectorAll('#venueFilters .chip').forEach(btn => {
-            if (btn.dataset.venue === 'all') {
-                btn.classList.toggle('active', venueFilters.has('all'));
+    // ← v1.5変更: ページフィルター状態復元
+    if (settings && pageFilters.size > 0) {
+        document.querySelectorAll('#pageFilters .chip').forEach(btn => {
+            if (btn.dataset.page === 'all') {
+                btn.classList.toggle('active', pageFilters.has('all'));
             } else {
-                btn.classList.toggle('active', venueFilters.has(btn.dataset.venue));
+                btn.classList.toggle('active', pageFilters.has(btn.dataset.page));
             }
         });
     }
