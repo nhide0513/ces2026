@@ -252,14 +252,16 @@ function highlightCompanyOnMap(companyIndex) {
     }
     
     const companyPage = parseFloat(company.pdfPage);
+
+    
     if (!isNaN(companyPage) && companyPage !== currentMapPage) {
         switchMapPage(companyPage);
-        // 地図初期化完了を待ってから再実行
+        const savedIndex = index;  // ← indexを保存
         setTimeout(() => {
-            highlightCompanyOnMap(index);
+            highlightCompanyOnMap(savedIndex);
         }, 300);
         return;
-    }
+    }   
     
     const pdfPage = parseFloat(company.pdfPage);
     const pdfX = parseFloat(company.pdfX);
