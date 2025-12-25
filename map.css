@@ -16,7 +16,7 @@
    ======================================== */
 
 .leaflet-popup-content-wrapper {
-    background: var(--bg-card);
+    background: #ffffff;  /* ← 完全な白色に変更 */
     color: var(--text-primary);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
