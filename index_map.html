@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CES 2026 地図機能 - Step 2</title>
+    
+    <!-- Leaflet.js -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Papa Parse for CSV -->
+    <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f1e8;
+            color: #5d4e37;
+        }
+        
+        .header {
+            background: #a8c686;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .controls {
+            padding: 1rem;
+            background: white;
+            border-bottom: 1px solid #e8dcc8;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .stat-item {
+            font-size: 0.9rem;
+        }
+        
+        .stat-item strong {
+            color: #7ea355;
+        }
+        
+        .search-box {
+            width: 100%;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            border: 1px solid #e8dcc8;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        #map {
+            width: 100%;
+            height: calc(100vh - 180px);
+            min-height: 400px;
+            background: white;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            text-align: center;
+        }
+        
+        .loading.hidden {
+            display: none;
+        }
+        
+        /* Leaflet ポップアップのカスタマイズ */
+        .leaflet-popup-content-wrapper {
+            border-radius: 8px;
+        }
+        
+        .leaflet-popup-content {
+            margin: 12px;
+            min-width: 200px;
+        }
+        
+        .popup-title {
+            font-weight: bold;
+            color: #5d4e37;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid #e8dcc8;
+            padding-bottom: 0.5rem;
+        }
+        
+        .popup-info {
+            font-size: 0.85rem;
+            color: #8b7d6b;
+            margin: 0.25rem 0;
+        }
+        
+        .popup-booth {
+            display: inline-block;
+            background: #a8c686;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        
+        .popup-badges {
+            margin-top: 0.5rem;
+        }
+        
+        .popup-badge {
+            display: inline-block;
+            background: #ffd89b;
+            color: #8b5a3c;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-right: 0.25rem;
+        }
+        
+        .popup-badge.best {
+            background: #ffd89b;
+        }
+        
+        .popup-badge.yamanaka {
+            background: #e8dcc8;
+        }
+        
+        .popup-badge.nagasaka {
+            background: #e8dcc8;
+        }
+        
+        /* ピンの色分け用カスタムアイコン */
+        .custom-marker {
+            background: #e74c3c;
+            border: 2px solid white;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        
+        .debug-panel {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            color: #0f0;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 11px;
+            border-radius: 4px;
+            z-index: 2000;
+            max-width: 300px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .debug-panel.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🗺️ CES 2026 地図機能 - Step 2</h1>
+        <p>Venetian Expo, Level 1, Hall G</p>
+    </div>
+    
+    <div class="controls">
+        <div class="stats">
+            <span class="stat-item">表示企業数: <strong id="companyCount">読込中...</strong></span>
+            <span class="stat-item">座標: <strong id="coordInfo">-</strong></span>
+        </div>
+        <input type="text" class="search-box" id="searchBox" placeholder="🔍 企業名で検索...">
+    </div>
+    
+    <div id="map"></div>
+    
+    <div class="loading" id="loading">
+        <p>📍 座標データを読み込み中...</p>
+        <p style="font-size: 0.8rem; color: #888; margin-top: 0.5rem;">ページ11の企業を表示します</p>
+    </div>
+    
+    <div class="debug-panel hidden" id="debugPanel">
+        <div id="debugLog"></div>
+    </div>
+
+    <script>
+    // ============================================
+    // CES 2026 地図機能 - Step 2
+    // Leaflet.js + CSV座標データ
+    // 高解像度版（1200 DPI）
+    // ============================================
+    
+    // 定数
+    const CONFIG = {
+        // 画像サイズ（1200 DPI 高解像度版）
+        IMAGE_WIDTH: 13201,
+        IMAGE_HEIGHT: 10200,
+        
+        // PDF座標系（pdfplumberで取得）
+        PDF_WIDTH: 792,
+        PDF_HEIGHT: 612,
+        
+        // DPI設定
+        DPI: 1200,
+        
+        // 対象ページ
+        TARGET_PAGE: 11,
+        
+        // 画像パス
+        IMAGE_PATH: './page_11_1200dpi.png',
+        
+        // CSVパス
+        CSV_PATH: './coordinates.csv'
+    };
+    
+    // スケール計算（シンプル版）
+    // PDF座標（792x612 pt）→ PNG座標（13201x10200 px）
+    // 変換係数: 1200 DPI / 72 pt = 16.667
+    const PDF_TO_PNG_SCALE = CONFIG.DPI / 72;  // 16.667
+    
+    // グローバル変数
+    let map = null;
+    let allCompanies = [];
+    let filteredCompanies = [];
+    let markers = [];
+    let markerLayer = null;
+    
+    // デバッグログ
+    function debugLog(msg) {
+        console.log(msg);
+        const logEl = document.getElementById('debugLog');
+        if (logEl) {
+            logEl.innerHTML += msg + '<br>';
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+    }
+    
+    // CSV座標（PDF座標 792x612基準）→ Leaflet座標に変換
+    function csvToLeaflet(pdfX, pdfY) {
+        // PDF座標をPNG座標に変換（DPI変換）
+        const pngX = pdfX * PDF_TO_PNG_SCALE;
+        const pngY = pdfY * PDF_TO_PNG_SCALE;
+        
+        // Y軸を反転（Leaflet Simple CRSは左上原点、PDFは左下原点）
+        const leafletLat = CONFIG.IMAGE_HEIGHT - pngY;
+        const leafletLng = pngX;
+        
+        return [leafletLat, leafletLng];
+    }
+    
+    // Leafletマップの初期化
+    function initMap() {
+        debugLog('Initializing Leaflet map...');
+        
+        // Simple CRSで初期化
+        map = L.map('map', {
+            crs: L.CRS.Simple,
+            minZoom: -4,
+            maxZoom: 4,
+            zoomSnap: 0.25,
+            zoomDelta: 0.5
+        });
+        
+        // 画像の境界を設定
+        const bounds = [[0, 0], [CONFIG.IMAGE_HEIGHT, CONFIG.IMAGE_WIDTH]];
+        
+        // 背景画像をオーバーレイ
+        L.imageOverlay(CONFIG.IMAGE_PATH, bounds).addTo(map);
+        
+        // 表示範囲を画像に合わせる
+        map.fitBounds(bounds);
+        
+        // マーカー用のレイヤーグループ
+        markerLayer = L.layerGroup().addTo(map);
+        
+        // マウス位置表示（デバッグ用）
+        map.on('mousemove', function(e) {
+            const coordInfo = document.getElementById('coordInfo');
+            if (coordInfo) {
+                coordInfo.textContent = `lat: ${e.latlng.lat.toFixed(1)}, lng: ${e.latlng.lng.toFixed(1)}`;
+            }
+        });
+        
+        debugLog('Map initialized: ' + CONFIG.IMAGE_WIDTH + 'x' + CONFIG.IMAGE_HEIGHT);
+    }
+    
+    // CSVデータの読み込み
+    async function loadCSVData() {
+        debugLog('Loading CSV data...');
+        
+        return new Promise((resolve, reject) => {
+            Papa.parse(CONFIG.CSV_PATH, {
+                download: true,
+                header: true,
+                encoding: 'UTF-8',
+                complete: function(results) {
+                    debugLog('CSV loaded: ' + results.data.length + ' rows');
+                    
+                    // ページ11のデータをフィルタリング
+                    const page11Data = results.data.filter(row => {
+                        const page = parseFloat(row['PDFページ']);
+                        return page === CONFIG.TARGET_PAGE;
+                    });
+                    
+                    debugLog('Page 11 companies: ' + page11Data.length);
+                    
+                    // データを整形
+                    const companies = page11Data.map(row => ({
+                        name: row['会社名'] || '',
+                        venue: row['会場'] || '',
+                        booth: row['ブース番号'] || '',
+                        description: row['説明（日本語）'] || '',
+                        bestOfInnovation: row['Best of Innovation'] === '★',
+                        yamanakaWant: parseStars(row['山中行きたい']),
+                        nagasakaWant: parseStars(row['長坂行きたい']),
+                        pdfPage: parseFloat(row['PDFページ']) || 0,
+                        pdfX: parseFloat(row['PDF_X']) || 0,
+                        pdfY: parseFloat(row['PDF_Y']) || 0,
+                        source: row['座標ソース'] || ''
+                    })).filter(c => c.name && c.pdfX && c.pdfY);
+                    
+                    debugLog('Valid companies: ' + companies.length);
+                    resolve(companies);
+                },
+                error: function(error) {
+                    debugLog('CSV Error: ' + error.message);
+                    reject(error);
+                }
+            });
+        });
+    }
+    
+    // ★の数をパース
+    function parseStars(value) {
+        if (!value || value === 'NaN') return 0;
+        if (value === '★★') return 2;
+        if (value === '★') return 1;
+        return 0;
+    }
+    
+    // マーカーの作成
+    function createMarkers(companies) {
+        debugLog('Creating markers for ' + companies.length + ' companies');
+        
+        // 既存のマーカーをクリア
+        markerLayer.clearLayers();
+        markers = [];
+        
+        companies.forEach(company => {
+            // CSV座標をLeaflet座標に変換
+            const [lat, lng] = csvToLeaflet(company.pdfX, company.pdfY);
+            
+            // カスタムアイコン（円形）
+            const icon = L.divIcon({
+                className: 'custom-marker-wrapper',
+                html: '<div class="custom-marker" style="width: 12px; height: 12px;"></div>',
+                iconSize: [12, 12],
+                iconAnchor: [6, 6]
+            });
+            
+            // マーカー作成
+            const marker = L.marker([lat, lng], { icon: icon });
+            
+            // ポップアップ内容
+            let popupContent = `
+                <div class="popup-title">${escapeHtml(company.name)}</div>
+                <div class="popup-info">📍 ${escapeHtml(company.venue)}</div>
+                <span class="popup-booth">ブース ${escapeHtml(company.booth)}</span>
+            `;
+            
+            // バッジ追加
+            let badges = [];
+            if (company.bestOfInnovation) badges.push('<span class="popup-badge best">🏆 Best of Innovation</span>');
+            if (company.yamanakaWant === 2) badges.push('<span class="popup-badge yamanaka">⭐⭐山中</span>');
+            else if (company.yamanakaWant === 1) badges.push('<span class="popup-badge yamanaka">⭐山中</span>');
+            if (company.nagasakaWant === 2) badges.push('<span class="popup-badge nagasaka">⭐⭐長坂</span>');
+            else if (company.nagasakaWant === 1) badges.push('<span class="popup-badge nagasaka">⭐長坂</span>');
+            
+            if (badges.length > 0) {
+                popupContent += '<div class="popup-badges">' + badges.join('') + '</div>';
+            }
+            
+            marker.bindPopup(popupContent);
+            
+            // データを紐付け
+            marker.companyData = company;
+            
+            // レイヤーに追加
+            markerLayer.addLayer(marker);
+            markers.push(marker);
+        });
+        
+        // カウント更新
+        document.getElementById('companyCount').textContent = companies.length + '社';
+        
+        debugLog('Markers created: ' + markers.length);
+    }
+    
+    // HTMLエスケープ
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // 検索フィルター
+    function filterCompanies(query) {
+        if (!query) {
+            filteredCompanies = [...allCompanies];
+        } else {
+            const lowerQuery = query.toLowerCase();
+            filteredCompanies = allCompanies.filter(c => 
+                c.name.toLowerCase().includes(lowerQuery) ||
+                c.booth.toLowerCase().includes(lowerQuery)
+            );
+        }
+        
+        createMarkers(filteredCompanies);
+    }
+    
+    // 初期化
+    async function init() {
+        debugLog('=== Step 2 Initialization (1200 DPI) ===');
+        
+        try {
+            // マップ初期化
+            initMap();
+            
+            // CSVデータ読み込み
+            allCompanies = await loadCSVData();
+            filteredCompanies = [...allCompanies];
+            
+            // マーカー作成
+            createMarkers(filteredCompanies);
+            
+            // ローディング非表示
+            document.getElementById('loading').classList.add('hidden');
+            
+            // 検索ボックスイベント
+            document.getElementById('searchBox').addEventListener('input', function(e) {
+                filterCompanies(e.target.value);
+            });
+            
+            debugLog('=== Initialization Complete ===');
+            
+        } catch (error) {
+            debugLog('ERROR: ' + error.message);
+            document.getElementById('loading').innerHTML = 
+                '<p style="color: red;">❌ エラーが発生しました</p>' +
+                '<p style="font-size: 0.8rem;">' + error.message + '</p>';
+        }
+    }
+    
+    // DOM読み込み完了後に初期化
+    document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
