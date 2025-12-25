@@ -39,7 +39,7 @@
             padding: 1rem;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 99;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
@@ -63,9 +63,9 @@
             padding: 1rem;
             background: white;
             border-bottom: 1px solid var(--border);
-            /* position: sticky は削除 */
-            /* top: 4.5rem; は削除 */
-            z-index: 98;
+            position: sticky;
+            top: 0;  /* ← 画面最上部に固定 */
+            z-index: 100;  /* ← ヘッダーより上に表示 */
         }
         
         .tabs {
