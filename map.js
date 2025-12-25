@@ -85,7 +85,6 @@ function initMap() {
     
     // 地図の初期表示位置を設定
     map.fitBounds(bounds);
-    map.setZoom(7);  // ← この行を追加（0が適度な拡大、必要に応じて調整）
     
     console.log('✓ 地図初期化完了');
 }
@@ -288,13 +287,16 @@ function updateMapWithFilter() {
 function onMapTabShow() {
     console.log('🗺️ 地図タブが表示されました');
     
-    // 地図が初期化されていなければ初期化
     if (!map) {
         initMap();
         
-        // 現在フィルタリングされている企業を表示
         const filteredCompanies = getFilteredCompanies();
         displayMapMarkers(filteredCompanies);
+        
+        // ← ここに追加
+        setTimeout(() => {
+            map.setZoom(0);
+        }, 100);
     }
 }
 
