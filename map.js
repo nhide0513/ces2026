@@ -148,8 +148,11 @@ function switchMapPage(pageNum) {
     // 地図を再初期化
     initMap();
     
-    // マーカーを再表示（現在表示中の企業リストを使用）
-    if (window.allCompanies && window.allCompanies.length > 0) {
+    // マーカーを再表示（フィルタ済みの企業リストを使用）
+    if (typeof getFilteredCompanies === 'function') {
+        const filteredCompanies = getFilteredCompanies();
+        displayMapMarkers(filteredCompanies);
+    } else if (window.allCompanies && window.allCompanies.length > 0) {
         displayMapMarkers(window.allCompanies);
     }
     
