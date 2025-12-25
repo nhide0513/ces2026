@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CES 2026 訪問管理</title>
     
-    <!-- ========== 追加: Leaflet CSS ========== -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
           crossorigin=""/>
     <link rel="stylesheet" href="map.css">
-    <!-- ======================================== -->
     
     <style>
+        /* 既存のスタイルはそのまま */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
@@ -59,6 +58,16 @@
             gap: 0.25rem;
         }
         
+        /* フィルタをタブの上に配置するためposition調整 */
+        .filters {
+            padding: 1rem;
+            background: white;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 4.5rem;
+            z-index: 98;
+        }
+        
         .tabs {
             display: flex;
             background: white;
@@ -85,12 +94,6 @@
         .tab.active {
             color: var(--primary);
             border-bottom-color: var(--primary);
-        }
-        
-        .filters {
-            padding: 1rem;
-            background: white;
-            border-bottom: 1px solid var(--border);
         }
         
         .filter-toggle {
@@ -334,94 +337,91 @@
         </div>
     </div>
     
+    <!-- ========== フィルタをタブの上に移動 ========== -->
+    <div class="filters">
+        <button class="filter-toggle" id="filterToggle" onclick="toggleFilters()">
+            🔼 検索・フィルター非表示
+        </button>
+        
+        <div id="filterDetails" class="filter-details">
+            <input type="text" class="search-box" id="searchBox" placeholder="🔍 会社名で検索...">
+            
+            <div class="filter-section">
+                <div class="filter-label">訪問状況</div>
+                <div class="filter-chips" id="statusFilters">
+                    <button class="chip active" data-filter="all">すべて</button>
+                    <button class="chip" data-filter="unvisited">未訪問</button>
+                    <button class="chip" data-filter="visited">訪問済み</button>
+                </div>
+            </div>
+            
+            <div class="filter-section">
+                <div class="filter-label">会場（複数選択可）</div>
+                <div class="filter-chips" id="venueFilters">
+                    <button class="chip active" data-venue="all">すべて</button>
+                    <button class="chip" data-venue="LVCC - Central Hall">LVCC - Central Hall</button>
+                    <button class="chip" data-venue="LVCC - North Hall">LVCC - North Hall</button>
+                    <button class="chip" data-venue="LVCC - Other">LVCC - Other</button>
+                    <button class="chip" data-venue="LVCC - South Hall">LVCC - South Hall</button>
+                    <button class="chip" data-venue="LVCC - West Hall">LVCC - West Hall</button>
+                    <button class="chip" data-venue="LVCC Central">LVCC Central</button>
+                    <button class="chip" data-venue="LVCC North">LVCC North</button>
+                    <button class="chip" data-venue="LVCC South">LVCC South</button>
+                    <button class="chip" data-venue="LVCC West">LVCC West</button>
+                    <button class="chip" data-venue="Other">Other</button>
+                    <button class="chip" data-venue="Venetian Expo">Venetian Expo</button>
+                    <button class="chip" data-venue="Westgate">Westgate</button>
+                    <button class="chip" data-venue="Wynn Las Vegas">Wynn Las Vegas</button>
+                </div>
+            </div>
+            
+            <div class="filter-section">
+                <div class="filter-label">行きたい・Best（複数選択可）</div>
+                <div class="filter-chips" id="priorityFilters">
+                    <button class="chip" data-filter="all">すべて</button>
+                    <button class="chip active" data-filter="candidate">🗺️ 候補企業 (113社)</button>
+                    <button class="chip" data-filter="yamanaka-star2">山中★★</button>
+                    <button class="chip" data-filter="yamanaka-star1">山中★</button>
+                    <button class="chip" data-filter="nagasaka-star2">長坂★★</button>
+                    <button class="chip" data-filter="nagasaka-star1">長坂★</button>
+                    <button class="chip" data-filter="best">Best of Innovation</button>
+                </div>
+            </div>
+            
+            <div class="filter-section">
+                <div class="filter-label">いいね（複数選択可）</div>
+                <div class="filter-chips" id="likeFilters">
+                    <button class="chip active" data-filter="all">すべて</button>
+                    <button class="chip" data-filter="yamanaka-like1">👍山中</button>
+                    <button class="chip" data-filter="yamanaka-like2">❤️山中</button>
+                    <button class="chip" data-filter="nagasaka-like1">👍長坂</button>
+                    <button class="chip" data-filter="nagasaka-like2">❤️長坂</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ============================================== -->
+    
     <div class="tabs">
         <button class="tab active" onclick="switchTab('list')">リスト</button>
         <button class="tab" onclick="switchTab('map')">マップ</button>
     </div>
     
     <div id="listView">
-        <div class="filters">
-            <button class="filter-toggle" id="filterToggle" onclick="toggleFilters()">
-                🔼 検索・フィルター非表示
-            </button>
-            
-            <div id="filterDetails" class="filter-details">
-                <input type="text" class="search-box" id="searchBox" placeholder="🔍 会社名で検索...">
-                
-                <div class="filter-section">
-                    <div class="filter-label">訪問状況</div>
-                    <div class="filter-chips" id="statusFilters">
-                        <button class="chip active" data-filter="all">すべて</button>
-                        <button class="chip" data-filter="unvisited">未訪問</button>
-                        <button class="chip" data-filter="visited">訪問済み</button>
-                    </div>
-                </div>
-                
-                <div class="filter-section">
-                    <div class="filter-label">会場（複数選択可）</div>
-                    <div class="filter-chips" id="venueFilters">
-                        <button class="chip active" data-venue="all">すべて</button>
-                        <button class="chip" data-venue="LVCC - Central Hall">LVCC - Central Hall</button>
-                        <button class="chip" data-venue="LVCC - North Hall">LVCC - North Hall</button>
-                        <button class="chip" data-venue="LVCC - Other">LVCC - Other</button>
-                        <button class="chip" data-venue="LVCC - South Hall">LVCC - South Hall</button>
-                        <button class="chip" data-venue="LVCC - West Hall">LVCC - West Hall</button>
-                        <button class="chip" data-venue="LVCC Central">LVCC Central</button>
-                        <button class="chip" data-venue="LVCC North">LVCC North</button>
-                        <button class="chip" data-venue="LVCC South">LVCC South</button>
-                        <button class="chip" data-venue="LVCC West">LVCC West</button>
-                        <button class="chip" data-venue="Other">Other</button>
-                        <button class="chip" data-venue="Venetian Expo">Venetian Expo</button>
-                        <button class="chip" data-venue="Westgate">Westgate</button>
-                        <button class="chip" data-venue="Wynn Las Vegas">Wynn Las Vegas</button>
-                    </div>
-                </div>
-                
-                <div class="filter-section">
-                    <div class="filter-label">行きたい・Best（複数選択可）</div>
-                    <div class="filter-chips" id="priorityFilters">
-                        <button class="chip" data-filter="all">すべて</button>
-                        <button class="chip active" data-filter="candidate">🗺️ 候補企業 (113社)</button>
-                        <button class="chip" data-filter="yamanaka-star2">山中★★</button>
-                        <button class="chip" data-filter="yamanaka-star1">山中★</button>
-                        <button class="chip" data-filter="nagasaka-star2">長坂★★</button>
-                        <button class="chip" data-filter="nagasaka-star1">長坂★</button>
-                        <button class="chip" data-filter="best">Best of Innovation</button>
-                    </div>
-                </div>
-                
-                <div class="filter-section">
-                    <div class="filter-label">いいね（複数選択可）</div>
-                    <div class="filter-chips" id="likeFilters">
-                        <button class="chip active" data-filter="all">すべて</button>
-                        <button class="chip" data-filter="yamanaka-like1">👍山中</button>
-                        <button class="chip" data-filter="yamanaka-like2">❤️山中</button>
-                        <button class="chip" data-filter="nagasaka-like1">👍長坂</button>
-                        <button class="chip" data-filter="nagasaka-like2">❤️長坂</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
         <div class="company-list" id="companyList">
             <div class="loading">読み込み中...</div>
         </div>
     </div>
     
-    <!-- ========== 修正: 地図ビューの内容変更 ========== -->
     <div id="mapView" class="hidden">
         <div id="mapContainer"></div>
         <div id="mapStats">📍 読み込み中...</div>
     </div>
-    <!-- ================================================= -->
     
-    <!-- ========== 追加: Leaflet.jsとmap.jsを追加 ========== -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
             crossorigin=""></script>
     <script src="map.js"></script>
-    <!-- =================================================== -->
-    
     <script src="app.js"></script>
 </body>
 </html>
