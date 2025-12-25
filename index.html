@@ -9,7 +9,6 @@
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
           crossorigin=""/>
     <link rel="stylesheet" href="map.css">
-    <link rel="stylesheet" href="map_panel_styles.css">
     
     <style>
         /* 既存のスタイルはそのまま */
@@ -40,7 +39,7 @@
             padding: 1rem;
             position: sticky;
             top: 0;
-            z-index: 99;
+            z-index: 100;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
@@ -65,8 +64,8 @@
             background: white;
             border-bottom: 1px solid var(--border);
             position: sticky;
-            top: 0;  /* ← 画面最上部に固定 */
-            z-index: 100;  /* ← ヘッダーより上に表示 */
+            top: 4.5rem;
+            z-index: 98;
         }
         
         .tabs {
@@ -93,8 +92,7 @@
         }
         
         .tab.active {
-            background: var(--primary);  /* 黄緑色で塗りつぶし */
-            color: white;                 /* 文字を白に */
+            color: var(--primary);
             border-bottom-color: var(--primary);
         }
         
@@ -323,8 +321,6 @@
         
         .hidden { display: none; }
     </style>
-    
-    <script src="page-venues.js"></script>
 </head>
 <body>
     <div class="header">
@@ -360,17 +356,22 @@
             </div>
             
             <div class="filter-section">
-                <div class="filter-label">会場/ページ（複数選択可）</div>
-                <div class="filter-chips" id="pageFilters">
-                    <button class="chip active" data-page="all">すべて</button>
-                    <button class="chip" data-page="2">LVCC West (P2)</button>
-                    <button class="chip" data-page="6">LVCC North (P6)</button>
-                    <button class="chip" data-page="8">LVCC Central (P8)</button>
-                    <button class="chip" data-page="10">LVCC South (P10)</button>
-                    <button class="chip" data-page="11">Venetian L1 (P11)</button>
-                    <button class="chip" data-page="12">Venetian L2 (P12)</button>
-                    <button class="chip" data-page="13">Venetian L3 (P13)</button>
-                    <button class="chip" data-page="14">Venetian L4 (P14)</button>
+                <div class="filter-label">会場（複数選択可）</div>
+                <div class="filter-chips" id="venueFilters">
+                    <button class="chip active" data-venue="all">すべて</button>
+                    <button class="chip" data-venue="LVCC - Central Hall">LVCC - Central Hall</button>
+                    <button class="chip" data-venue="LVCC - North Hall">LVCC - North Hall</button>
+                    <button class="chip" data-venue="LVCC - Other">LVCC - Other</button>
+                    <button class="chip" data-venue="LVCC - South Hall">LVCC - South Hall</button>
+                    <button class="chip" data-venue="LVCC - West Hall">LVCC - West Hall</button>
+                    <button class="chip" data-venue="LVCC Central">LVCC Central</button>
+                    <button class="chip" data-venue="LVCC North">LVCC North</button>
+                    <button class="chip" data-venue="LVCC South">LVCC South</button>
+                    <button class="chip" data-venue="LVCC West">LVCC West</button>
+                    <button class="chip" data-venue="Other">Other</button>
+                    <button class="chip" data-venue="Venetian Expo">Venetian Expo</button>
+                    <button class="chip" data-venue="Westgate">Westgate</button>
+                    <button class="chip" data-venue="Wynn Las Vegas">Wynn Las Vegas</button>
                 </div>
             </div>
             
@@ -413,6 +414,24 @@
     </div>
     
     <div id="mapView" class="hidden">
+        <!-- 地図切替ボタン -->
+        <button id="mapSwitcher" class="map-switcher">
+            🗺️ <span id="currentMapName">Venetian Expo L1</span>
+        </button>
+        
+        <!-- 地図選択ドロップダウン -->
+        <div id="mapDropdown" class="map-dropdown hidden">
+            <div class="map-option active" data-page="11">✓ P11: Venetian Expo L1</div>
+            <div class="map-option" data-page="12">P12: Venetian Expo L2</div>
+            <div class="map-option" data-page="13">P13: Venetian Expo L3</div>
+            <div class="map-option" data-page="14">P14: Venetian Expo L4</div>
+            <div class="map-divider"></div>
+            <div class="map-option" data-page="2">P2: LVCC West</div>
+            <div class="map-option" data-page="6">P6: LVCC North</div>
+            <div class="map-option" data-page="8">P8: LVCC Central</div>
+            <div class="map-option" data-page="10">P10: LVCC South</div>
+        </div>
+        
         <div id="mapContainer"></div>
         <div id="mapStats">📍 読み込み中...</div>
     </div>

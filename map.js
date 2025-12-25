@@ -14,13 +14,54 @@ const DEFAULT_ZOOM_LEVEL = 7;
 
 // 地図画像のサイズ（1200 DPI）
 const MAP_IMAGES = {
+    2: {
+        url: 'page_2.png',
+        width: 13201,
+        height: 10200,
+        name: 'LVCC West Hall'
+    },
+    6: {
+        url: 'page_6.png',
+        width: 13201,
+        height: 10200,
+        name: 'LVCC North Hall'
+    },
+    8: {
+        url: 'page_8.png',
+        width: 13201,
+        height: 10200,
+        name: 'LVCC Central Hall'
+    },
+    10: {
+        url: 'page_10.png',
+        width: 13201,
+        height: 10200,
+        name: 'LVCC South Halls 1-2'
+    },
     11: {
         url: 'page_11.png',
         width: 13201,
         height: 10200,
         name: 'Venetian Expo Level 1'
+    },
+    12: {
+        url: 'page_12.png',
+        width: 13201,
+        height: 10200,
+        name: 'Venetian Expo Level 2'
+    },
+    13: {
+        url: 'page_13.png',
+        width: 13201,
+        height: 10200,
+        name: 'Venetian Expo Level 3'
+    },
+    14: {
+        url: 'page_14.png',
+        width: 13201,
+        height: 10200,
+        name: 'Venetian Expo Level 4'
     }
-    // 他のページは後で追加
 };
 
 // PDF座標系の定義（Letter Size: 792x612pt）
@@ -89,6 +130,32 @@ function initMap() {
     console.log('✓ 地図初期化完了');
 }
 
+/**
+ * 地図ページを切り替え
+ * @param {number} pageNum - 切り替え先のページ番号
+ */
+function switchMapPage(pageNum) {
+    console.log(`🔄 地図切替: P${currentMapPage} → P${pageNum}`);
+    
+    // ページが存在するか確認
+    if (!MAP_IMAGES[pageNum]) {
+        console.error(`❌ ページ${pageNum}の地図画像が見つかりません`);
+        return;
+    }
+    
+    currentMapPage = pageNum;
+    
+    // 地図を再初期化
+    initMap();
+    
+    // マーカーを再表示（現在表示中の企業リストを使用）
+    if (window.allCompanies && window.allCompanies.length > 0) {
+        displayMapMarkers(window.allCompanies);
+    }
+    
+    console.log(`✓ 地図切替完了: ${MAP_IMAGES[pageNum].name}`);
+}
+
 // ========================================
 // マーカー表示
 // ========================================
@@ -128,19 +195,17 @@ function displayMapMarkers(companies) {
             });
             
             // マーカークリック時にパネルを表示（v1.6変更）
-marker.on('click', function() {
-    console.log('マーカーがクリックされました'); // ← この行を追加
-    const [lat, lng] = pdfToLeaflet(pdfX, pdfY);
-    const companiesAtLocation = findCompaniesAtLocation(lat, lng);
-    console.log('見つかった企業数:', companiesAtLocation.length); // ← この行を追加
-    showMapPanel(companiesAtLocation);
-    
-    // クリックされたマーカーを赤色に
-    markers.forEach(m => {
-        m.setStyle({fillColor: '#3b82f6', color: '#ffffff'});
-    });
-    marker.setStyle({fillColor: '#ff0000', color: '#ffffff'});
-});
+            marker.on('click', function() {
+                const [lat, lng] = pdfToLeaflet(pdfX, pdfY);
+                const companiesAtLocation = findCompaniesAtLocation(lat, lng);
+                showMapPanel(companiesAtLocation);
+                
+                // クリックされたマーカーを赤色に
+                markers.forEach(m => {
+                    m.setStyle({fillColor: '#3b82f6', color: '#ffffff'});
+                });
+                marker.setStyle({fillColor: '#ff0000', color: '#ffffff'});
+            });
             
             // マーカーを地図に追加
             marker.addTo(map);
@@ -291,6 +356,7 @@ function onMapTabShow() {
     
     if (!map) {
         initMap();
+        initMapSwitcher(); // 地図切替UI初期化
         
         const filteredCompanies = getFilteredCompanies();
         displayMapMarkers(filteredCompanies);
@@ -327,8 +393,6 @@ let currentPanelData = null;
  * @param {Array} companiesAtLocation - 同一座標の企業配列
  */
 function showMapPanel(companiesAtLocation) {
-    console.log('showMapPanel呼び出し:', companiesAtLocation); // ← 追加
-    
     // パネルデータを初期化
     currentPanelData = {
         companies: companiesAtLocation,
@@ -336,16 +400,11 @@ function showMapPanel(companiesAtLocation) {
         showFullDescription: false
     };
     
-    console.log('renderPanel呼び出し前'); // ← 追加
-    
     // パネルを作成または更新
     renderPanel();
     
-    console.log('パネル表示処理'); // ← 追加
-    
     // パネルを表示
     const panel = document.getElementById('mapInfoPanel');
-    console.log('パネル要素:', panel); // ← 追加
     if (panel) {
         panel.classList.add('visible');
     }
@@ -426,7 +485,7 @@ function renderPanel() {
         <div class="panel-content">
             <div class="panel-info">
                 <div class="panel-info-item">📍 ${escapeHtmlPanel(venueName)}</div>
-                <div class="panel-info-item">ブース: ${escapeHtmlPanel(company.booth || '不明')}</div>
+                <div class="panel-info-item">ブース: <span class="booth-link" onclick="focusOnBooth(${companies[currentIndex].lat}, ${companies[currentIndex].lng})">${escapeHtmlPanel(company.booth || '不明')}</span></div>
             </div>
     `;
     
@@ -515,10 +574,12 @@ function findCompaniesAtLocation(lat, lng) {
     const result = [];
     
     companies.forEach((company, index) => {
+        const pdfPage = parseFloat(company.pdfPage);
         const pdfX = parseFloat(company.pdfX);
         const pdfY = parseFloat(company.pdfY);
         
-        if (!isNaN(pdfX) && !isNaN(pdfY)) {
+        // 現在のページかつ座標データがある企業のみ
+        if (pdfPage === currentMapPage && !isNaN(pdfX) && !isNaN(pdfY)) {
             const [companyLat, companyLng] = pdfToLeaflet(pdfX, pdfY);
             
             // 0.1未満の差は同一座標とみなす
@@ -536,16 +597,84 @@ function findCompaniesAtLocation(lat, lng) {
     return result;
 }
 
-// パネル外クリックで閉じる（修正版）
+// パネル外クリックで閉じる
 document.addEventListener('click', function(e) {
     const panel = document.getElementById('mapInfoPanel');
     if (panel && panel.classList.contains('visible')) {
-        // クリックがパネル外の場合のみ
-        if (!panel.contains(e.target) && 
-            !e.target.closest('.leaflet-interactive')) {  // ← これに変更
+        // クリックがパネル外かつマーカー外の場合
+        if (!panel.contains(e.target) && !e.target.closest('.leaflet-marker-icon')) {
             closeMapPanel();
         }
     }
-}, true);  // ← キャプチャフェーズで実行
+});
 
-console.log('✓ map.js v1.6 読み込み完了');
+
+/**
+ * ブース番号クリック時の動作（ブース位置にズーム）
+ * @param {number} lat - 緯度
+ * @param {number} lng - 経度
+ */
+function focusOnBooth(lat, lng) {
+    if (map) {
+        map.setView([lat, lng], DEFAULT_ZOOM_LEVEL + 1);
+    }
+}
+
+// ========================================
+// 地図切替UIのイベントハンドラ
+// ========================================
+
+/**
+ * 地図切替UIを初期化
+ */
+function initMapSwitcher() {
+    const switcherBtn = document.getElementById('mapSwitcher');
+    const dropdown = document.getElementById('mapDropdown');
+    
+    if (!switcherBtn || !dropdown) {
+        console.warn('⚠️ 地図切替UIが見つかりません');
+        return;
+    }
+    
+    // 切替ボタンクリック
+    switcherBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdown.classList.toggle('hidden');
+    });
+    
+    // ドロップダウン外をクリックで閉じる
+    document.addEventListener('click', function(e) {
+        if (!dropdown.classList.contains('hidden') && 
+            !dropdown.contains(e.target) && 
+            e.target !== switcherBtn) {
+            dropdown.classList.add('hidden');
+        }
+    });
+    
+    // 地図オプション選択
+    const mapOptions = dropdown.querySelectorAll('.map-option');
+    mapOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const pageNum = parseInt(this.dataset.page);
+            const pageName = this.textContent.replace('✓ ', '').trim();
+            
+            // アクティブ状態を更新
+            mapOptions.forEach(opt => opt.classList.remove('active'));
+            this.classList.add('active');
+            
+            // 表示名を更新
+            const displayName = pageName.split(': ')[1]; // "P11: Venetian Expo L1" → "Venetian Expo L1"
+            document.getElementById('currentMapName').textContent = displayName;
+            
+            // ドロップダウンを閉じる
+            dropdown.classList.add('hidden');
+            
+            // 地図を切り替え
+            switchMapPage(pageNum);
+        });
+    });
+    
+    console.log('✓ 地図切替UI初期化完了');
+}
+
+console.log('✓ map.js v1.7 読み込み完了');
