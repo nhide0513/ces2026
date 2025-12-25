@@ -327,6 +327,8 @@ let currentPanelData = null;
  * @param {Array} companiesAtLocation - 同一座標の企業配列
  */
 function showMapPanel(companiesAtLocation) {
+    console.log('showMapPanel呼び出し:', companiesAtLocation); // ← 追加
+    
     // パネルデータを初期化
     currentPanelData = {
         companies: companiesAtLocation,
@@ -334,11 +336,16 @@ function showMapPanel(companiesAtLocation) {
         showFullDescription: false
     };
     
+    console.log('renderPanel呼び出し前'); // ← 追加
+    
     // パネルを作成または更新
     renderPanel();
     
+    console.log('パネル表示処理'); // ← 追加
+    
     // パネルを表示
     const panel = document.getElementById('mapInfoPanel');
+    console.log('パネル要素:', panel); // ← 追加
     if (panel) {
         panel.classList.add('visible');
     }
