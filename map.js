@@ -83,8 +83,7 @@ function initMap() {
         return;
     }
     
-    // 地図の初期表示位置を設定
-    map.fitBounds(bounds);
+
     
     console.log('✓ 地図初期化完了');
 }
@@ -209,7 +208,7 @@ function highlightCompanyOnMap(companyIndex) {
     const [lat, lng] = pdfToLeaflet(pdfX, pdfY);
     
     // 該当位置にズームして、既存マーカーを一時的にハイライト
-    map.setView([lat, lng], 0); // ズームレベル0
+    map.setView([lat, lng], 7); // ズームレベル0
     
     // 該当するマーカーを探してポップアップを開く
     setTimeout(() => {
