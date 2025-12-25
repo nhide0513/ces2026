@@ -9,7 +9,7 @@ let map = null;
 let markers = [];
 let currentMapPage = 11; // デフォルトはページ11（Venetian Expo Level 1）
 
-const DEFAULT_ZOOM_LEVEL = 7;  // ← この行を追加
+const DEFAULT_ZOOM_LEVEL = 7;
 
 // 地図画像のサイズ（1200 DPI）
 const MAP_IMAGES = {
@@ -85,8 +85,6 @@ function initMap() {
         return;
     }
     
-
-    
     console.log('✓ 地図初期化完了');
 }
 
@@ -128,13 +126,16 @@ function displayMapMarkers(companies) {
                 fillOpacity: 0.8
             });
             
+            // ← v1.5変更: ページ番号から会場名を取得
+            const venueName = getVenueName(company.pdfPage);
+            
             // ポップアップを設定
             const popupContent = `
                 <div style="min-width: 200px;">
                     <strong style="font-size: 14px;">${company.name}</strong><br>
                     <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #ddd;">
                         <span style="color: #666;">ブース:</span> ${company.booth}<br>
-                        <span style="color: #666;">会場:</span> ${company.venue}
+                        <span style="color: #666;">会場:</span> ${venueName}
                     </div>
                 </div>
             `;
@@ -210,7 +211,7 @@ function highlightCompanyOnMap(companyIndex) {
     const [lat, lng] = pdfToLeaflet(pdfX, pdfY);
     
     // 該当位置にズームして、既存マーカーを一時的にハイライト
-    map.setView([lat, lng], DEFAULT_ZOOM_LEVEL); // ズームレベル0
+    map.setView([lat, lng], DEFAULT_ZOOM_LEVEL);
     
     // 該当するマーカーを探してポップアップを開く
     setTimeout(() => {
@@ -299,7 +300,6 @@ function onMapTabShow() {
         const filteredCompanies = getFilteredCompanies();
         displayMapMarkers(filteredCompanies);
         
-        // ← ここに追加
         setTimeout(() => {
             map.setZoom(DEFAULT_ZOOM_LEVEL);
         }, 100);
