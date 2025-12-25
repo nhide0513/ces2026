@@ -9,6 +9,8 @@ let map = null;
 let markers = [];
 let currentMapPage = 11; // デフォルトはページ11（Venetian Expo Level 1）
 
+const DEFAULT_ZOOM_LEVEL = 7;  // ← この行を追加
+
 // 地図画像のサイズ（1200 DPI）
 const MAP_IMAGES = {
     11: {
@@ -208,7 +210,7 @@ function highlightCompanyOnMap(companyIndex) {
     const [lat, lng] = pdfToLeaflet(pdfX, pdfY);
     
     // 該当位置にズームして、既存マーカーを一時的にハイライト
-    map.setView([lat, lng], 7); // ズームレベル0
+    map.setView([lat, lng], DEFAULT_ZOOM_LEVEL); // ズームレベル0
     
     // 該当するマーカーを探してポップアップを開く
     setTimeout(() => {
@@ -294,7 +296,7 @@ function onMapTabShow() {
         
         // ← ここに追加
         setTimeout(() => {
-            map.setZoom(3);
+            map.setZoom(DEFAULT_ZOOM_LEVEL);
         }, 100);
     }
 }
