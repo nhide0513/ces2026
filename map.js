@@ -66,7 +66,7 @@ function initMap() {
     map = L.map('mapContainer', {
         crs: L.CRS.Simple,
         minZoom: -3,
-        maxZoom: 5,
+        maxZoom: 10,
         zoomSnap: 0.5,
         zoomControl: true,
         attributionControl: false
