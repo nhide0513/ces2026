@@ -295,7 +295,7 @@ function onMapTabShow() {
         
         // ← ここに追加
         setTimeout(() => {
-            map.setZoom(0);
+            map.setZoom(3);
         }, 100);
     }
 }
