@@ -406,6 +406,8 @@ let currentPanelData = null;
  * @param {Array} companiesAtLocation - 同一座標の企業配列
  */
 function showMapPanel(companiesAtLocation) {
+    console.log('🔍 showMapPanel呼び出し:', companiesAtLocation);  // ← この行を追加
+
     // パネルデータを初期化
     currentPanelData = {
         companies: companiesAtLocation,
