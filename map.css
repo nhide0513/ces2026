@@ -20,7 +20,7 @@
     color: var(--text-primary);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    opacity: 0.95;  /* ← この行を追加（少し透明） */
+    opacity: 0.98;  /* ← この行を追加（少し透明） */
 }
 
 .leaflet-popup-tip {
