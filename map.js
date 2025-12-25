@@ -1,5 +1,6 @@
-// CES 2026 地図機能 - map.js
+// CES 2026 地図機能 - map.js v1.6
 // Leaflet.js Simple CRSを使用した地図表示
+// v1.6: 企業情報パネル機能を追加
 
 // ========================================
 // グローバル変数
@@ -126,25 +127,17 @@ function displayMapMarkers(companies) {
                 fillOpacity: 0.8
             });
             
-            // ← v1.5変更: ページ番号から会場名を取得
-            const venueName = getVenueName(company.pdfPage);
-            
-            // ポップアップを設定
-            const popupContent = `
-                <div style="min-width: 200px;">
-                    <strong style="font-size: 14px;">${company.name}</strong><br>
-                    <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #ddd;">
-                        <span style="color: #666;">ブース:</span> ${company.booth}<br>
-                        <span style="color: #666;">会場:</span> ${venueName}
-                    </div>
-                </div>
-            `;
-            
-            marker.bindPopup(popupContent);
-            
-            // マーカークリック時にリストビューで該当企業にスクロール
+            // マーカークリック時にパネルを表示（v1.6変更）
             marker.on('click', function() {
-                highlightCompanyInList(index);
+                const [lat, lng] = pdfToLeaflet(pdfX, pdfY);
+                const companiesAtLocation = findCompaniesAtLocation(lat, lng);
+                showMapPanel(companiesAtLocation);
+                
+                // クリックされたマーカーを赤色に
+                markers.forEach(m => {
+                    m.setStyle({fillColor: '#3b82f6', color: '#ffffff'});
+                });
+                marker.setStyle({fillColor: '#ff0000', color: '#ffffff'});
             });
             
             // マーカーを地図に追加
@@ -213,16 +206,16 @@ function highlightCompanyOnMap(companyIndex) {
     // 該当位置にズームして、既存マーカーを一時的にハイライト
     map.setView([lat, lng], DEFAULT_ZOOM_LEVEL);
     
-    // 該当するマーカーを探してポップアップを開く
+    // 該当するマーカーを探してパネルを表示（v1.6変更）
     setTimeout(() => {
+        const companiesAtLocation = findCompaniesAtLocation(lat, lng);
+        showMapPanel(companiesAtLocation);
+        
         markers.forEach(marker => {
             const markerLatLng = marker.getLatLng();
             if (Math.abs(markerLatLng.lat - lat) < 0.1 && Math.abs(markerLatLng.lng - lng) < 0.1) {
-                // 選択されたマーカーを赤色に
                 marker.setStyle({fillColor: '#ff0000', color: '#ffffff'});
-                marker.openPopup();
             } else {
-                // 他のマーカーは青色に戻す
                 marker.setStyle({fillColor: '#3b82f6', color: '#ffffff'});
             }
         });
@@ -321,4 +314,228 @@ function resetMapView() {
     }
 }
 
-console.log('✓ map.js読み込み完了');
+// ========================================
+// 地図情報パネル機能（v1.6で追加）
+// ========================================
+
+let currentPanelData = null;
+
+/**
+ * パネルを表示
+ * @param {Array} companiesAtLocation - 同一座標の企業配列
+ */
+function showMapPanel(companiesAtLocation) {
+    // パネルデータを初期化
+    currentPanelData = {
+        companies: companiesAtLocation,
+        currentIndex: 0,
+        showFullDescription: false
+    };
+    
+    // パネルを作成または更新
+    renderPanel();
+    
+    // パネルを表示
+    const panel = document.getElementById('mapInfoPanel');
+    if (panel) {
+        panel.classList.add('visible');
+    }
+}
+
+/**
+ * パネルを閉じる
+ */
+function closeMapPanel() {
+    const panel = document.getElementById('mapInfoPanel');
+    if (panel) {
+        panel.classList.remove('visible');
+    }
+    
+    // すべてのマーカーを青色に戻す
+    markers.forEach(marker => {
+        marker.setStyle({fillColor: '#3b82f6', color: '#ffffff'});
+    });
+    
+    currentPanelData = null;
+}
+
+/**
+ * パネル内容をレンダリング
+ */
+function renderPanel() {
+    if (!currentPanelData) return;
+    
+    const { companies, currentIndex, showFullDescription } = currentPanelData;
+    const company = companies[currentIndex].company;
+    const companyIndex = companies[currentIndex].index;
+    
+    // パネル要素を取得または作成
+    let panel = document.getElementById('mapInfoPanel');
+    if (!panel) {
+        panel = document.createElement('div');
+        panel.id = 'mapInfoPanel';
+        panel.className = 'map-info-panel';
+        document.body.appendChild(panel);
+    }
+    
+    // 会場名を取得
+    const venueName = getVenueName(company.pdfPage);
+    
+    // 説明文の処理
+    const description = company.description || '';
+    const needsTruncate = description.length > 200;
+    const displayDescription = (needsTruncate && !showFullDescription) 
+        ? description.substring(0, 200) + '...' 
+        : description;
+    
+    // HTML生成
+    let html = `
+        <div class="panel-header">
+            <h3 class="panel-company-name">${escapeHtmlPanel(company.name)}</h3>
+            <button class="panel-close-button" onclick="closeMapPanel()">×</button>
+    `;
+    
+    // 複数企業の場合はナビゲーション表示
+    if (companies.length > 1) {
+        html += `
+            <div class="panel-navigation">
+                <button class="panel-nav-button" onclick="navigatePanel(-1)" ${currentIndex === 0 ? 'disabled' : ''}>
+                    ← 前へ
+                </button>
+                <span class="panel-indicator">(${currentIndex + 1}/${companies.length})</span>
+                <button class="panel-nav-button" onclick="navigatePanel(1)" ${currentIndex === companies.length - 1 ? 'disabled' : ''}>
+                    次へ →
+                </button>
+            </div>
+        `;
+    }
+    
+    html += `</div>`;
+    
+    // コンテンツ
+    html += `
+        <div class="panel-content">
+            <div class="panel-info">
+                <div class="panel-info-item">📍 ${escapeHtmlPanel(venueName)}</div>
+                <div class="panel-info-item">ブース: ${escapeHtmlPanel(company.booth || '不明')}</div>
+            </div>
+    `;
+    
+    if (description) {
+        html += `
+            <div class="panel-description ${needsTruncate && !showFullDescription ? 'truncated' : ''}">
+                ${escapeHtmlPanel(displayDescription)}
+            </div>
+        `;
+        
+        if (needsTruncate) {
+            html += `
+                <button class="panel-show-more" onclick="togglePanelDescription()">
+                    ${showFullDescription ? '...閉じる' : '...もっと見る'}
+                </button>
+            `;
+        }
+    }
+    
+    html += `</div>`;
+    
+    // フッター
+    html += `
+        <div class="panel-footer">
+            <button class="panel-list-button" onclick="showInList(${companyIndex})">
+                リストで見る
+            </button>
+        </div>
+    `;
+    
+    panel.innerHTML = html;
+}
+
+/**
+ * カルーセルナビゲーション
+ * @param {number} direction - 1（次へ）or -1（前へ）
+ */
+function navigatePanel(direction) {
+    if (!currentPanelData) return;
+    
+    const newIndex = currentPanelData.currentIndex + direction;
+    
+    if (newIndex >= 0 && newIndex < currentPanelData.companies.length) {
+        currentPanelData.currentIndex = newIndex;
+        currentPanelData.showFullDescription = false; // 説明文をリセット
+        renderPanel();
+    }
+}
+
+/**
+ * 説明文の展開/折りたたみ
+ */
+function togglePanelDescription() {
+    if (!currentPanelData) return;
+    
+    currentPanelData.showFullDescription = !currentPanelData.showFullDescription;
+    renderPanel();
+}
+
+/**
+ * 「リストで見る」ボタンのハンドラー
+ * @param {number} companyIndex - 企業のインデックス
+ */
+function showInList(companyIndex) {
+    closeMapPanel();
+    highlightCompanyInList(companyIndex);
+}
+
+/**
+ * HTMLエスケープ（パネル用）
+ */
+function escapeHtmlPanel(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+/**
+ * 同一座標の企業を探す
+ * @param {number} lat - 緯度
+ * @param {number} lng - 経度
+ * @returns {Array} - 同一座標の企業配列
+ */
+function findCompaniesAtLocation(lat, lng) {
+    const result = [];
+    
+    companies.forEach((company, index) => {
+        const pdfX = parseFloat(company.pdfX);
+        const pdfY = parseFloat(company.pdfY);
+        
+        if (!isNaN(pdfX) && !isNaN(pdfY)) {
+            const [companyLat, companyLng] = pdfToLeaflet(pdfX, pdfY);
+            
+            // 0.1未満の差は同一座標とみなす
+            if (Math.abs(companyLat - lat) < 0.1 && Math.abs(companyLng - lng) < 0.1) {
+                result.push({
+                    company: company,
+                    index: index,
+                    lat: companyLat,
+                    lng: companyLng
+                });
+            }
+        }
+    });
+    
+    return result;
+}
+
+// パネル外クリックで閉じる
+document.addEventListener('click', function(e) {
+    const panel = document.getElementById('mapInfoPanel');
+    if (panel && panel.classList.contains('visible')) {
+        // クリックがパネル外かつマーカー外の場合
+        if (!panel.contains(e.target) && !e.target.closest('.leaflet-marker-icon')) {
+            closeMapPanel();
+        }
+    }
+});
+
+console.log('✓ map.js v1.6 読み込み完了');
