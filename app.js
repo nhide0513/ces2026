@@ -269,6 +269,11 @@ function renderCompanyList() {
     });
     
     container.innerHTML = html;
+    
+    // 地図も更新（地図が初期化済みの場合のみ）
+    if (typeof updateMapWithFilter === 'function') {
+        updateMapWithFilter();
+    }
 }
 
 function updateStats() {
@@ -322,7 +327,11 @@ function toggleDescription(index) {
 }
 
 function showMap(index) {
-    alert('マップ機能は準備中です');
+    if (typeof highlightCompanyOnMap === 'function') {
+        highlightCompanyOnMap(index);
+    } else {
+        alert('地図機能の読み込みに失敗しました');
+    }
 }
 
 function toggleFilters() {
@@ -344,6 +353,11 @@ function switchTab(tab) {
     } else {
         document.getElementById('listView').classList.add('hidden');
         document.getElementById('mapView').classList.remove('hidden');
+        
+        // 地図タブが表示されたときに初期化
+        if (typeof onMapTabShow === 'function') {
+            onMapTabShow();
+        }
     }
 }
 
