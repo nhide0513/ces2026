@@ -9,6 +9,7 @@
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
           crossorigin=""/>
     <link rel="stylesheet" href="map.css">
+    <link rel="stylesheet" href="map_panel_styles.css">
     
     <style>
         /* 既存のスタイルはそのまま */
@@ -39,7 +40,7 @@
             padding: 1rem;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 99;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
@@ -64,8 +65,8 @@
             background: white;
             border-bottom: 1px solid var(--border);
             position: sticky;
-            top: 4.5rem;
-            z-index: 98;
+            top: 0;  /* ← 画面最上部に固定 */
+            z-index: 100;  /* ← ヘッダーより上に表示 */
         }
         
         .tabs {
@@ -92,7 +93,8 @@
         }
         
         .tab.active {
-            color: var(--primary);
+            background: var(--primary);  /* 黄緑色で塗りつぶし */
+            color: white;                 /* 文字を白に */
             border-bottom-color: var(--primary);
         }
         
@@ -321,6 +323,8 @@
         
         .hidden { display: none; }
     </style>
+    
+    <script src="page-venues.js"></script>
 </head>
 <body>
     <div class="header">
@@ -413,7 +417,7 @@
         <button id="mapSwitcher" class="map-switcher">
             🗺️ <span id="currentMapName">Venetian Expo L1</span>
         </button>
-        
+    
         <!-- 地図選択ドロップダウン -->
         <div id="mapDropdown" class="map-dropdown hidden">
             <div class="map-option active" data-page="11">✓ P11: Venetian Expo L1</div>
@@ -426,7 +430,7 @@
             <div class="map-option" data-page="8">P8: LVCC Central</div>
             <div class="map-option" data-page="10">P10: LVCC South</div>
         </div>
-        
+    
         <div id="mapContainer"></div>
         <div id="mapStats">📍 読み込み中...</div>
     </div>
@@ -434,7 +438,6 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
             crossorigin=""></script>
-    <script src="page-venues.js"></script>
     <script src="map.js"></script>
     <script src="app.js"></script>
 </body>
