@@ -217,7 +217,12 @@ function highlightCompanyOnMap(companyIndex) {
         markers.forEach(marker => {
             const markerLatLng = marker.getLatLng();
             if (Math.abs(markerLatLng.lat - lat) < 0.1 && Math.abs(markerLatLng.lng - lng) < 0.1) {
+                // 選択されたマーカーを赤色に
+                marker.setStyle({fillColor: '#ff0000', color: '#ffffff'});
                 marker.openPopup();
+            } else {
+                // 他のマーカーは青色に戻す
+                marker.setStyle({fillColor: '#3b82f6', color: '#ffffff'});
             }
         });
     }, 300);
