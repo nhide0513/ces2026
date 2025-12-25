@@ -322,6 +322,8 @@
         
         .hidden { display: none; }
     </style>
+    
+    <script src="page-venues.js"></script>
 </head>
 <body>
     <div class="header">
@@ -357,22 +359,17 @@
             </div>
             
             <div class="filter-section">
-                <div class="filter-label">会場（複数選択可）</div>
-                <div class="filter-chips" id="venueFilters">
-                    <button class="chip active" data-venue="all">すべて</button>
-                    <button class="chip" data-venue="LVCC - Central Hall">LVCC - Central Hall</button>
-                    <button class="chip" data-venue="LVCC - North Hall">LVCC - North Hall</button>
-                    <button class="chip" data-venue="LVCC - Other">LVCC - Other</button>
-                    <button class="chip" data-venue="LVCC - South Hall">LVCC - South Hall</button>
-                    <button class="chip" data-venue="LVCC - West Hall">LVCC - West Hall</button>
-                    <button class="chip" data-venue="LVCC Central">LVCC Central</button>
-                    <button class="chip" data-venue="LVCC North">LVCC North</button>
-                    <button class="chip" data-venue="LVCC South">LVCC South</button>
-                    <button class="chip" data-venue="LVCC West">LVCC West</button>
-                    <button class="chip" data-venue="Other">Other</button>
-                    <button class="chip" data-venue="Venetian Expo">Venetian Expo</button>
-                    <button class="chip" data-venue="Westgate">Westgate</button>
-                    <button class="chip" data-venue="Wynn Las Vegas">Wynn Las Vegas</button>
+                <div class="filter-label">会場/ページ（複数選択可）</div>
+                <div class="filter-chips" id="pageFilters">
+                    <button class="chip active" data-page="all">すべて</button>
+                    <button class="chip" data-page="2">LVCC West (P2)</button>
+                    <button class="chip" data-page="6">LVCC North (P6)</button>
+                    <button class="chip" data-page="8">LVCC Central (P8)</button>
+                    <button class="chip" data-page="10">LVCC South (P10)</button>
+                    <button class="chip" data-page="11">Venetian L1 (P11)</button>
+                    <button class="chip" data-page="12">Venetian L2 (P12)</button>
+                    <button class="chip" data-page="13">Venetian L3 (P13)</button>
+                    <button class="chip" data-page="14">Venetian L4 (P14)</button>
                 </div>
             </div>
             
