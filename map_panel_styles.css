@@ -1,0 +1,182 @@
+
+/* ========================================
+   地図情報パネル（v1.6で追加）
+   ======================================== */
+
+.map-info-panel {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    width: 400px;
+    max-height: 80vh;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    padding: 0;
+    overflow: hidden;
+    display: none;
+}
+
+.map-info-panel.visible {
+    display: block;
+}
+
+/* パネルヘッダー */
+.panel-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e8dcc8;
+    position: relative;
+}
+
+.panel-company-name {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+    padding-right: 40px;
+}
+
+.panel-close-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.panel-close-button:hover {
+    background: #f0f0f0;
+}
+
+/* カルーセルナビゲーション */
+.panel-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.panel-nav-button {
+    background: none;
+    border: none;
+    color: var(--primary);
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.panel-nav-button:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+}
+
+.panel-indicator {
+    font-weight: 600;
+}
+
+/* パネルコンテンツ */
+.panel-content {
+    padding: 1.5rem;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.panel-info {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    margin-bottom: 1rem;
+}
+
+.panel-info-item {
+    margin-bottom: 0.25rem;
+}
+
+.panel-description {
+    font-size: 0.875rem;
+    color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.panel-description.truncated {
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.panel-show-more {
+    background: none;
+    border: none;
+    color: var(--primary);
+    cursor: pointer;
+    font-size: 0.875rem;
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+/* パネルフッター */
+.panel-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e8dcc8;
+}
+
+.panel-list-button {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.panel-list-button:hover {
+    background: var(--primary-dark);
+}
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+    .map-info-panel {
+        width: 90vw;
+        right: 5vw;
+        bottom: 10px;
+    }
+}
+
+/* ダークモード対応 */
+@media (prefers-color-scheme: dark) {
+    .map-info-panel {
+        background: #2a2a2a;
+        color: #ffffff;
+    }
+    
+    .panel-header {
+        border-bottom-color: #444;
+    }
+    
+    .panel-footer {
+        border-top-color: #444;
+    }
+    
+    .panel-close-button:hover {
+        background: #3a3a3a;
+    }
+}
