@@ -31,7 +31,7 @@ async function loadCompaniesData() {
         }
         const data = await response.json();
         companies = data;
-        console.log('✓ 会社データ読み込み完了:', companies.length + '件');
+        console.log('$2713 会社データ読み込み完了:', companies.length + '件');
         return true;
     } catch (error) {
         console.error('データ読み込みエラー:', error);
@@ -53,7 +53,7 @@ function loadFromStorage() {
         if (visitedData) visitedStatus = JSON.parse(visitedData);
         if (likedData) likedStatus = JSON.parse(likedData);
         
-        console.log('✓ LocalStorageから読み込み完了');
+        console.log('$2713 LocalStorageから読み込み完了');
     } catch (error) {
         console.error('LocalStorage読み込みエラー:', error);
         visitedStatus = {};
@@ -88,7 +88,7 @@ function saveToAppsScript(companyName) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     }).then(() => {
-        console.log('✓ Apps Scriptに保存: ' + companyName);
+        console.log('$2713 Apps Scriptに保存: ' + companyName);
     }).catch((error) => {
         console.warn('Apps Script保存エラー（無視）:', error);
     });
@@ -113,7 +113,7 @@ async function loadFromAppsScript() {
             renderCompanyList();
             updateStats();
             
-            console.log('✓ スプレッドシートから同期完了');
+            console.log('$2713 スプレッドシートから同期完了');
         }
     } catch (error) {
         console.warn('同期エラー（LocalStorageで継続）:', error);
@@ -227,14 +227,14 @@ function renderCompanyList() {
         else if (company.yamanakaWant === 1) badges += '<span class="badge">★山中</span>';
         if (company.nagasakaWant === 2) badges += '<span class="badge">★★長坂</span>';
         else if (company.nagasakaWant === 1) badges += '<span class="badge">★長坂</span>';
-        if (company.bestOfInnovation) badges += '<span class="badge innovation-badge">🏆Best</span>';
+        if (company.bestOfInnovation) badges += '<span class="badge innovation-badge">$D83C$DFC6Best</span>';
         
         const desc = company.description || '';
         const needsExpand = desc.length > 200;
         const truncatedDesc = needsExpand ? desc.substring(0, 200) + '...' : desc;
         
-        const nagasakaText = nagasakaLike === 2 ? '❤️長坂' : nagasakaLike === 1 ? '👍長坂' : '長坂';
-        const yamanakaText = yamanakaLike === 2 ? '❤️山中' : yamanakaLike === 1 ? '👍山中' : '山中';
+        const nagasakaText = nagasakaLike === 2 ? '$2764$FE0F長坂' : nagasakaLike === 1 ? '$D83D$DC4D長坂' : '長坂';
+        const yamanakaText = yamanakaLike === 2 ? '$2764$FE0F山中' : yamanakaLike === 1 ? '$D83D$DC4D山中' : '山中';
         const nagasakaClass = nagasakaLike === 2 ? 'loved' : nagasakaLike === 1 ? 'liked' : '';
         const yamanakaClass = yamanakaLike === 2 ? 'loved' : yamanakaLike === 1 ? 'liked' : '';
         
@@ -244,7 +244,7 @@ function renderCompanyList() {
         html += '<div class="company-card ' + (visited ? 'visited' : '') + '">';
         html += '<div class="company-header"><div class="company-name">' + company.name + '</div></div>';
         if (badges) html += '<div class="badges">' + badges + '</div>';
-        html += '<div class="company-info">📍 ' + (company.venue || '未定');
+        html += '<div class="company-info">$D83D$DCCD ' + (company.venue || '未定');
         if (company.booth) html += ' | ブース ' + company.booth;
         html += '</div>';
         
@@ -269,6 +269,12 @@ function renderCompanyList() {
     });
     
     container.innerHTML = html;
+
+
+    // 地図も更新（地図が初期化済みの場合のみ）
+    if (typeof updateMapWithFilter === 'function') {
+        updateMapWithFilter();
+    }
 }
 
 function updateStats() {
@@ -322,14 +328,14 @@ function toggleDescription(index) {
 }
 
 function showMap(index) {
-    alert('マップ機能は準備中です');
+    highlightCompanyOnMap(index);  // ← map.jsの関数を呼ぶ
 }
 
 function toggleFilters() {
     const details = document.getElementById('filterDetails');
     const toggle = document.getElementById('filterToggle');
     details.classList.toggle('hidden');
-    toggle.textContent = details.classList.contains('hidden') ? '🔽 検索・フィルター表示' : '🔼 検索・フィルター非表示';
+    toggle.textContent = details.classList.contains('hidden') ? '$D83D$DD3D 検索・フィルター表示' : '$D83D$DD3C 検索・フィルター非表示';
     saveSettings();
 }
 
@@ -344,6 +350,9 @@ function switchTab(tab) {
     } else {
         document.getElementById('listView').classList.add('hidden');
         document.getElementById('mapView').classList.remove('hidden');
+        
+        // 地図タブが表示されたときに初期化
+        onMapTabShow();  // ← map.jsの関数を呼ぶ
     }
 }
 
@@ -499,7 +508,7 @@ async function init() {
     // フィルター表示状態復元
     if (settings && !settings.filterDetailsVisible) {
         document.getElementById('filterDetails').classList.add('hidden');
-        document.getElementById('filterToggle').textContent = '🔽 検索・フィルター表示';
+        document.getElementById('filterToggle').textContent = '$D83D$DD3D 検索・フィルター表示';
     }
     
     // フィルターイベント設定
@@ -512,7 +521,7 @@ async function init() {
     // 定期同期（1分ごと）
     setInterval(loadFromAppsScript, 60000);
     
-    console.log('✓ 初期化完了');
+    console.log('$2713 初期化完了');
 }
 
 // DOMContentLoaded時に初期化
