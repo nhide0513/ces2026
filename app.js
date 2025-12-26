@@ -10,6 +10,8 @@ let priorityFilters = new Set(['candidate']);
 let likeFilters = new Set(['all']);
 let searchQuery = '';
 let currentTab = 'list';
+let searchQuery = '';
+let searchMode = 'and';  // 追加
 
 const DISPLAY_INCREMENT = 30;  // 一度に表示する件数
 let currentDisplayCount = DISPLAY_INCREMENT;
@@ -169,9 +171,28 @@ function isCandidate(company) {
 
 function getFilteredCompanies() {
     return companies.filter(company => {
-        if (searchQuery && !company.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-            return false;
+        if (searchQuery) {
+            const keywords = searchQuery.toLowerCase().trim().split(/\s+/);
+            
+            if (searchMode === 'and') {
+                // すべて含む
+                const allMatch = keywords.every(keyword => {
+                    const matchName = company.name.toLowerCase().includes(keyword);
+                    const matchDesc = (company.description || '').toLowerCase().includes(keyword);
+                    return matchName || matchDesc;
+                });
+                if (!allMatch) return false;
+            } else {
+                // いずれか含む
+                const anyMatch = keywords.some(keyword => {
+                    const matchName = company.name.toLowerCase().includes(keyword);
+                    const matchDesc = (company.description || '').toLowerCase().includes(keyword);
+                    return matchName || matchDesc;
+                });
+                if (!anyMatch) return false;
+            }
         }
+        
         
         if (statusFilter === 'visited' && !visitedStatus[company.name]) return false;
         if (statusFilter === 'unvisited' && visitedStatus[company.name]) return false;
@@ -517,6 +538,24 @@ function setupFilterEvents() {
 // ========================================
 
 async function init() {
+    // 検索ボックス
+    const searchBox = document.getElementById('searchBox');
+    if (settings) searchBox.value = searchQuery;
+    searchBox.addEventListener('input', (e) => {
+        searchQuery = e.target.value;
+        renderCompanyList();
+        saveSettings();
+    });
+
+    // 検索モード（追加）
+    document.querySelectorAll('input[name="searchMode"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            searchMode = e.target.value;
+            renderCompanyList();
+            saveSettings();
+        });
+    });
+    
     // データ読み込み
     const loaded = await loadCompaniesData();
     if (!loaded) return;
