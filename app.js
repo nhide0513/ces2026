@@ -10,6 +10,9 @@ let priorityFilters = new Set(['candidate']);
 let likeFilters = new Set(['all']);
 let searchQuery = '';
 let currentTab = 'list';
+let displayLimit = 100;
+let currentDisplayCount = 100;
+
 
 // 定数
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx7d2Sy5JM2Jo8IcmF1x0g0hW9tXLjAXw3BjwNQL_izIF4frQQ9OQpPUGXAuRFMfYfzlA/exec';
@@ -218,8 +221,12 @@ function renderCompanyList() {
         return;
     }
     
+    // 表示件数を制限
+    const displayCompanies = filtered.slice(0, currentDisplayCount);
+    const hasMore = filtered.length > currentDisplayCount;
+    
     let html = '';
-    filtered.forEach(company => {
+    displayCompanies.forEach(company => {
         const visited = visitedStatus[company.name] || false;
         const nagasakaLike = likedStatus[company.name]?.nagasaka || 0;
         const yamanakaLike = likedStatus[company.name]?.yamanaka || 0;
