@@ -628,13 +628,15 @@ function findCompaniesAtLocation(lat, lng) {
 
 // パネル外クリックで閉じる
 document.addEventListener('click', function(e) {
-    const panel = document.getElementById('mapInfoPanel');
-    if (panel && panel.classList.contains('visible')) {
-        // クリックがパネル外かつマーカー外の場合
-        if (!panel.contains(e.target) && !e.target.closest('.leaflet-marker-icon')) {
-            closeMapPanel();
+    setTimeout(() => {
+        const panel = document.getElementById('mapInfoPanel');
+        if (panel && panel.classList.contains('visible')) {
+            // クリックがパネル外かつマーカー外の場合
+            if (!panel.contains(e.target) && !e.target.closest('.leaflet-marker-icon') && !e.target.closest('.leaflet-interactive')) {
+                closeMapPanel();
+            }
         }
-    }
+    }, 100);
 });
 
 
