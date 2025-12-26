@@ -279,6 +279,15 @@ function renderCompanyList() {
         html += '<button class="map-button" onclick="showMap(' + index + ')">map</button>';
         html += '</div></div>';
     });
+
+    // もっと見るボタン
+    if (hasMore) {
+        html += `<div style="text-align: center; padding: 2rem;">
+            <button onclick="loadMoreCompanies()" style="padding: 0.75rem 2rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer;">
+                さらに${Math.min(100, filtered.length - currentDisplayCount)}件読み込む（残り${filtered.length - currentDisplayCount}件）
+            </button>
+        </div>`;
+    }
     
     container.innerHTML = html;
     
