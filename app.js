@@ -291,6 +291,9 @@ function renderCompanyList() {
     }
     
     container.innerHTML = html;
+
+    // フィルタ結果件数を更新（追加）
+    document.getElementById('filteredCount').textContent = filtered.length;
     
     // 地図も更新（パネル非表示時のみ）
     if (typeof updateMapWithFilter === 'function') {
