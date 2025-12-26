@@ -537,14 +537,7 @@ function setupFilterEvents() {
 // ========================================
 
 async function init() {
-    // 検索ボックス
-    const searchBox = document.getElementById('searchBox');
-    if (settings) searchBox.value = searchQuery;
-    searchBox.addEventListener('input', (e) => {
-        searchQuery = e.target.value;
-        renderCompanyList();
-        saveSettings();
-    });
+
 
     // 検索モード（追加）
     document.querySelectorAll('input[name="searchMode"]').forEach(radio => {
