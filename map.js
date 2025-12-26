@@ -10,7 +10,7 @@ let map = null;
 let markers = [];
 let currentMapPage = 11; // デフォルトはページ11（Venetian Expo Level 1）
 
-const DEFAULT_ZOOM_LEVEL = 7;
+const DEFAULT_ZOOM_LEVEL = 5;
 
 // 地図画像のサイズ（1200 DPI）
 const MAP_IMAGES = {
