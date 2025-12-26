@@ -8,7 +8,6 @@ let statusFilter = 'all';
 let pageFilters = new Set(['all']);  // ← v1.5変更: venueFilters → pageFilters
 let priorityFilters = new Set(['candidate']);
 let likeFilters = new Set(['all']);
-let searchQuery = '';
 let currentTab = 'list';
 let searchQuery = '';
 let searchMode = 'and';  // 追加
