@@ -433,14 +433,7 @@ function showMapPanel(companiesAtLocation) {
 function closeMapPanel() {
     const panel = document.getElementById('mapInfoPanel');
     if (panel) {
-        console.log('visible追加前:', panel.classList.contains('visible'));
         panel.classList.add('visible');
-        console.log('visible追加直後:', panel.classList.contains('visible'));
-    
-        // 少し待ってから再確認
-        setTimeout(() => {
-            console.log('100ms後のvisible:', panel.classList.contains('visible'));
-        }, 100);
     }
     
     // すべてのマーカーを青色に戻す
