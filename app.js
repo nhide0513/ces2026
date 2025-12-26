@@ -275,9 +275,12 @@ function renderCompanyList() {
     
     container.innerHTML = html;
     
-    // 地図も更新（地図が初期化済みの場合のみ）
+    // 地図も更新（パネル非表示時のみ）
     if (typeof updateMapWithFilter === 'function') {
-        updateMapWithFilter();
+        const panel = document.getElementById('mapInfoPanel');
+        if (!panel || !panel.classList.contains('visible')) {
+            updateMapWithFilter();
+        }
     }
 }
 
