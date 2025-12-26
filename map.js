@@ -693,9 +693,6 @@ function initMapSwitcher() {
             mapOptions.forEach(opt => opt.classList.remove('active'));
             this.classList.add('active');
             
-            // 表示名を更新
-            const displayName = pageName.split(': ')[1]; // "P11: Venetian Expo L1" → "Venetian Expo L1"
-            document.getElementById('currentMapName').textContent = displayName;
             
             // ドロップダウンを閉じる
             dropdown.classList.add('hidden');
