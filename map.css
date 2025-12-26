@@ -4,7 +4,9 @@
 #mapView {
     position: relative;
 }
-
+#mapStats {
+    display: none;
+}
 
 /* ========================================
    地図コンテナ
