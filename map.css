@@ -150,6 +150,37 @@
     margin: 4px 0;
 }
 
+.pdf-link-button {
+    position: absolute;
+    top: 70px;  /* 地図切替ボタンの下 */
+    right: 10px;
+    background: #a8c686;  /* 黄緑色 */
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;  /* 円形 */
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.pdf-link-button:hover {
+    background: #7ea355;  /* 濃い黄緑 */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.pdf-link-button:active {
+    transform: translateY(0);
+}
+
+
 /* ========================================
    Leafletコントロールのスタイル調整
    ======================================== */
