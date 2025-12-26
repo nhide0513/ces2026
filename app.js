@@ -300,6 +300,11 @@ function renderCompanyList() {
     }
 }
 
+function loadMoreCompanies() {
+    currentDisplayCount += 100;
+    renderCompanyList();
+}
+
 function updateStats() {
     const visitedCount = Object.values(visitedStatus).filter(v => v).length;
     const candidateCount = companies.filter(c => isCandidate(c)).length;
