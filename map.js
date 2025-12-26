@@ -197,12 +197,14 @@ function displayMapMarkers(companies) {
                 fillOpacity: 0.8
             });
             
-            // マーカークリック時にパネルを表示（v1.6変更）
-            marker.on('click', function() {
+            marker.on('click', function(e) {
+                // イベント伝播を止める
+                L.DomEvent.stopPropagation(e);
+    
                 const [lat, lng] = pdfToLeaflet(pdfX, pdfY);
                 const companiesAtLocation = findCompaniesAtLocation(lat, lng);
                 showMapPanel(companiesAtLocation);
-                
+    
                 // クリックされたマーカーを赤色に
                 markers.forEach(m => {
                     m.setStyle({fillColor: '#3b82f6', color: '#ffffff'});
