@@ -375,7 +375,12 @@ function toggleFilters() {
 function switchTab(tab) {
     currentTab = tab;
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    event.target.classList.add('active');
+
+    // タブ名からボタンを特定
+    const targetTab = document.querySelector(`.tab[onclick="switchTab('${tab}')"]`);
+    if (targetTab) {
+        targetTab.classList.add('active');
+    }
     
     if (tab === 'list') {
         document.getElementById('listView').classList.remove('hidden');
