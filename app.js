@@ -10,8 +10,9 @@ let priorityFilters = new Set(['candidate']);
 let likeFilters = new Set(['all']);
 let searchQuery = '';
 let currentTab = 'list';
-let displayLimit = 100;
-let currentDisplayCount = 100;
+
+const DISPLAY_INCREMENT = 30;  // 一度に表示する件数
+let currentDisplayCount = DISPLAY_INCREMENT;
 
 
 // 定数
@@ -284,7 +285,7 @@ function renderCompanyList() {
     if (hasMore) {
         html += `<div style="text-align: center; padding: 2rem;">
             <button onclick="loadMoreCompanies()" style="padding: 0.75rem 2rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer;">
-                さらに${Math.min(100, filtered.length - currentDisplayCount)}件読み込む（残り${filtered.length - currentDisplayCount}件）
+                さらに${Math.min(DISPLAY_INCREMENT, filtered.length - currentDisplayCount)}件読み込む（残り${filtered.length - currentDisplayCount}件）
             </button>
         </div>`;
     }
@@ -301,7 +302,7 @@ function renderCompanyList() {
 }
 
 function loadMoreCompanies() {
-    currentDisplayCount += 100;
+    currentDisplayCount += DISPLAY_INCREMENT;
     renderCompanyList();
 }
 
