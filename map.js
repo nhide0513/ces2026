@@ -147,6 +147,9 @@ function switchMapPage(pageNum) {
     
     // 地図を再初期化
     initMap();
+
+    // 地図の中心とズームを設定
+    map.setView([50, 50], DEFAULT_ZOOM_LEVEL);
     
     // マーカーを再表示（フィルタ済みの企業リストを使用）
     if (typeof getFilteredCompanies === 'function') {
