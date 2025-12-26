@@ -508,6 +508,20 @@ async function init() {
             }
         });
     }
+
+
+
+    // ← 優先度フィルター状態復元（追加）
+    document.querySelectorAll('#priorityFilters .chip').forEach(btn => {
+        btn.classList.toggle('active', priorityFilters.has(btn.dataset.filter));
+    });
+
+    // ← いいねフィルター状態復元（追加）
+    document.querySelectorAll('#likeFilters .chip').forEach(btn => {
+        btn.classList.toggle('active', likeFilters.has(btn.dataset.filter));
+    });
+
+
     
     // 検索ボックス
     const searchBox = document.getElementById('searchBox');
@@ -517,12 +531,16 @@ async function init() {
         renderCompanyList();
         saveSettings();
     });
+
     
     // フィルター表示状態復元
     if (settings && !settings.filterDetailsVisible) {
         document.getElementById('filterDetails').classList.add('hidden');
         document.getElementById('filterToggle').textContent = '🔽 検索・フィルター表示';
     }
+
+
+
     
     // フィルターイベント設定
     setupFilterEvents();
