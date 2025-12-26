@@ -354,7 +354,17 @@
         </button>
         
         <div id="filterDetails" class="filter-details">
-            <input type="text" class="search-box" id="searchBox" placeholder="🔍 会社名で検索...">
+            <input type="text" class="search-box" id="searchBox" placeholder="🔍 会社名・説明で検索...">
+            <div style="display: flex; gap: 1rem; padding: 0.5rem 0; font-size: 0.75rem;">
+                <label style="display: flex; align-items: center; gap: 0.25rem; cursor: pointer;">
+                    <input type="radio" name="searchMode" value="and" checked>
+                    <span>すべて含む(AND)</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.25rem; cursor: pointer;">
+                    <input type="radio" name="searchMode" value="or">
+                    <span>いずれか含む(OR)</span>
+                </label>
+            </div>
             
             <div class="filter-section">
                 <div class="filter-label">訪問状況</div>
