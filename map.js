@@ -431,9 +431,13 @@ function showMapPanel(companiesAtLocation) {
  * パネルを閉じる
  */
 function closeMapPanel() {
+    console.log('🔴 closeMapPanel実行');
     const panel = document.getElementById('mapInfoPanel');
+    console.log('パネル要素:', panel);
     if (panel) {
-        panel.classList.add('visible');
+        console.log('visible削除前:', panel.classList.contains('visible'));
+        panel.classList.remove('visible');
+        console.log('visible削除後:', panel.classList.contains('visible'));
     }
     
     // すべてのマーカーを青色に戻す
@@ -442,6 +446,7 @@ function closeMapPanel() {
     });
     
     currentPanelData = null;
+    console.log('🔴 closeMapPanel完了');
 }
 
 /**
