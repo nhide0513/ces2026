@@ -436,6 +436,7 @@ function showMapPanel(companiesAtLocation) {
  */
 function closeMapPanel() {
     console.log('🔴 closeMapPanel実行');
+    console.trace('呼び出し元:');  // ← この行を追加
     const panel = document.getElementById('mapInfoPanel');
     console.log('パネル要素:', panel);
     if (panel) {
