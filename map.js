@@ -421,9 +421,13 @@ function showMapPanel(companiesAtLocation) {
     renderPanel();
     
     // パネルを表示
+
     const panel = document.getElementById('mapInfoPanel');
     if (panel) {
+        // 確実にvisibleを設定（同期処理より先に）
         panel.classList.add('visible');
+        // 強制的に反映
+        panel.offsetHeight; // リフロー強制
     }
 }
 
