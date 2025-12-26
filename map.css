@@ -5,6 +5,10 @@
     position: relative;
 }
 
+#currentMapName {
+    display: none;
+}
+
 /* ========================================
    地図コンテナ
    ======================================== */
@@ -68,7 +72,7 @@
 .map-switcher {
     position: absolute;
     top: 10px;
-    left: 10px;
+    right: 10px;
     background: #a8c686;  /* 黄緑色 */
     color: white;
     width: 50px;
