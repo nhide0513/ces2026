@@ -137,7 +137,6 @@ function initMap() {
 function switchMapPage(pageNum) {
     console.log(`🔄 地図切替: P${currentMapPage} → P${pageNum}`);
     
-    // ページが存在するか確認
     if (!MAP_IMAGES[pageNum]) {
         console.error(`❌ ページ${pageNum}の地図画像が見つかりません`);
         return;
@@ -145,21 +144,30 @@ function switchMapPage(pageNum) {
     
     currentMapPage = pageNum;
     
-    // 地図を再初期化
-    initMap();
-
-    // 地図の中心とズームを設定
-    map.setView([50, 50], DEFAULT_ZOOM_LEVEL);
+    // 既存のマーカーをクリア
+    clearMarkers();
     
-    // マーカーを再表示（フィルタ済みの企業リストを使用）
+    // 画像レイヤーのみ差し替え
+    const mapInfo = MAP_IMAGES[pageNum];
+    const bounds = [[0, 0], [100, 100]];
+    
+    // 既存の画像レイヤーを削除
+    map.eachLayer(function(layer) {
+        if (layer instanceof L.ImageOverlay) {
+            map.removeLayer(layer);
+        }
+    });
+    
+    // 新しい画像を追加
+    L.imageOverlay(mapInfo.url, bounds).addTo(map);
+    
+    // マーカーを再表示
     if (typeof getFilteredCompanies === 'function') {
         const filteredCompanies = getFilteredCompanies();
         displayMapMarkers(filteredCompanies);
-    } else if (window.allCompanies && window.allCompanies.length > 0) {
-        displayMapMarkers(window.allCompanies);
     }
     
-    console.log(`✓ 地図切替完了: ${MAP_IMAGES[pageNum].name}`);
+    console.log(`✓ 地図切替完了: ${mapInfo.name}`);
 }
 
 // ========================================
