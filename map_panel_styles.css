@@ -207,14 +207,11 @@
 }
 
 .panel-description.collapsed {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
+    display: none;  /* 完全に非表示 */
 }
 
 .panel-description.expanded {
+    display: block;
     max-height: 200px;
     overflow-y: auto;
-    transition: max-height 0.3s ease;
 }
-
