@@ -7,7 +7,7 @@
     right: 20px;
     bottom: 20px;
     width: 320px;
-    max-height: 40vh;
+    max-height: 50vh;
     background: #ffffff;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -90,7 +90,7 @@
 /* パネルコンテンツ */
 .panel-content {
     padding: 1rem;
-    max-height: 30vh;
+    max-height: 35vh;
     overflow-y: auto;
 }
 
