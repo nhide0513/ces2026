@@ -96,7 +96,7 @@
 
 @media (max-width: 768px) {
     .panel-content {
-        max-height: 30vh;  /* スマホではさらに調整 */
+        max-height: 26vh;  /* スマホではさらに調整 */
     }
 }
 .panel-info {
@@ -162,7 +162,7 @@
         width: 90vw;
         right: 5vw;
         bottom: 10px;
-        max-height: 30vh;
+        max-height: 40vh;
     }
 }
 
