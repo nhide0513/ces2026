@@ -640,19 +640,20 @@ function findCompaniesAtLocation(lat, lng) {
 
 // パネル外クリックで閉じる
 document.addEventListener('click', function(e) {
+    // タッチデバイスの場合はスキップ
+    if (e.pointerType === 'touch') return;
+    
     setTimeout(() => {
         const panel = document.getElementById('mapInfoPanel');
         if (panel && panel.classList.contains('visible')) {
-            // パネル内のボタンかどうかチェック
             const isPanelButton = e.target.closest('.panel-nav-button, .panel-close-button, .list-view-button, .expand-desc-button');
             
-            // クリックがパネル外かつマーカー外かつパネルボタン外の場合
             if (!panel.contains(e.target) && !e.target.closest('.leaflet-marker-icon') && !e.target.closest('.leaflet-interactive') && !isPanelButton) {
                 closeMapPanel();
             }
         }
     }, 100);
-})
+});
 
 
 /**
