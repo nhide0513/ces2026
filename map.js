@@ -639,15 +639,16 @@ function findCompaniesAtLocation(lat, lng) {
 
 // パネル外クリックで閉じる
 document.addEventListener('click', function(e) {
-    setTimeout(() => {
-        const panel = document.getElementById('mapInfoPanel');
-        if (panel && panel.classList.contains('visible')) {
-            // クリックがパネル外かつマーカー外の場合
-            if (!panel.contains(e.target) && !e.target.closest('.leaflet-marker-icon') && !e.target.closest('.leaflet-interactive')) {
-                closeMapPanel();
-            }
+    const panel = document.getElementById('mapInfoPanel');
+    if (panel && panel.classList.contains('visible')) {
+        // パネル内のボタンかどうかチェック
+        const isPanelButton = e.target.closest('.panel-nav-button, .panel-close-button, .list-view-button, .expand-desc-button');
+        
+        // クリックがパネル外かつマーカー外かつパネルボタン外の場合
+        if (!panel.contains(e.target) && !e.target.closest('.leaflet-marker-icon') && !isPanelButton) {
+            closeMapPanel();
         }
-    }, 100);
+    }
 });
 
 
