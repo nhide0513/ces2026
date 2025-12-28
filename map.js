@@ -638,15 +638,15 @@ function findCompaniesAtLocation(lat, lng) {
     return result;
 }
 
-// パネル外クリックで閉じる
+// パネル外クリックで閉じる（PCのみ）
 document.addEventListener('click', function(e) {
-    // タッチデバイスの場合はスキップ
-    if (e.pointerType === 'touch') return;
+    // モバイルデバイスでは無効化
+    if ('ontouchstart' in window) return;
     
     setTimeout(() => {
         const panel = document.getElementById('mapInfoPanel');
         if (panel && panel.classList.contains('visible')) {
-            const isPanelButton = e.target.closest('.panel-nav-button, .panel-close-button, .list-view-button, .expand-desc-button');
+            const isPanelButton = e.target.closest('.panel-nav-button, .panel-close-button, .list-view-button, .expand-desc-button, .panel-show-more, .booth-link');
             
             if (!panel.contains(e.target) && !e.target.closest('.leaflet-marker-icon') && !e.target.closest('.leaflet-interactive') && !isPanelButton) {
                 closeMapPanel();
