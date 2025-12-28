@@ -651,7 +651,7 @@ document.addEventListener('click', function(e) {
             }
         }
     }, 100);
-});
+})
 
 
 /**
