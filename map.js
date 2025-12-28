@@ -639,16 +639,18 @@ function findCompaniesAtLocation(lat, lng) {
 
 // パネル外クリックで閉じる
 document.addEventListener('click', function(e) {
-    const panel = document.getElementById('mapInfoPanel');
-    if (panel && panel.classList.contains('visible')) {
-        // パネル内のボタンかどうかチェック
-        const isPanelButton = e.target.closest('.panel-nav-button, .panel-close-button, .list-view-button, .expand-desc-button');
-        
-        // クリックがパネル外かつマーカー外かつパネルボタン外の場合
-        if (!panel.contains(e.target) && !e.target.closest('.leaflet-marker-icon') && !isPanelButton) {
-            closeMapPanel();
+    setTimeout(() => {
+        const panel = document.getElementById('mapInfoPanel');
+        if (panel && panel.classList.contains('visible')) {
+            // パネル内のボタンかどうかチェック
+            const isPanelButton = e.target.closest('.panel-nav-button, .panel-close-button, .list-view-button, .expand-desc-button');
+            
+            // クリックがパネル外かつマーカー外かつパネルボタン外の場合
+            if (!panel.contains(e.target) && !e.target.closest('.leaflet-marker-icon') && !e.target.closest('.leaflet-interactive') && !isPanelButton) {
+                closeMapPanel();
+            }
         }
-    }
+    }, 100);
 });
 
 
@@ -685,15 +687,7 @@ function initMapSwitcher() {
         dropdown.classList.toggle('hidden');
     });
     
-    // ドロップダウン外をクリックで閉じる
-    document.addEventListener('click', function(e) {
-        if (!dropdown.classList.contains('hidden') && 
-            !dropdown.contains(e.target) && 
-            e.target !== switcherBtn) {
-            dropdown.classList.add('hidden');
-        }
-    });
-    
+
     // 地図オプション選択
     const mapOptions = dropdown.querySelectorAll('.map-option');
     mapOptions.forEach(option => {
