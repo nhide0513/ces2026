@@ -214,3 +214,18 @@
         padding: 6px 12px;
     }
 }
+
+/* モバイル: マーカーのタップ判定を広げる */
+@media (max-width: 768px) {
+    .leaflet-marker-icon {
+        /* タップ領域を拡大（疑似的に） */
+        padding: 10px !important;
+        margin: -10px !important;
+    }
+    
+    /* マーカー自体を少し大きく */
+    .leaflet-interactive {
+        stroke-width: 3 !important;
+        r: 7 !important;  /* 円の半径を5→7に */
+    }
+}
