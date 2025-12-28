@@ -191,3 +191,30 @@
 .booth-link:hover {
     color: var(--primary-dark);
 }
+
+.expand-desc-button {
+    background: none;
+    border: none;
+    color: var(--primary);
+    cursor: pointer;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    text-decoration: underline;
+}
+
+.expand-desc-button:hover {
+    color: var(--primary-dark);
+}
+
+.panel-description.collapsed {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.panel-description.expanded {
+    max-height: 200px;
+    overflow-y: auto;
+    transition: max-height 0.3s ease;
+}
+
