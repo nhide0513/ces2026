@@ -94,6 +94,11 @@
     overflow-y: auto;
 }
 
+@media (max-width: 768px) {
+    .panel-content {
+        max-height: 20vh;  /* スマホではさらに調整 */
+    }
+}
 .panel-info {
     font-size: 0.875rem;
     color: var(--text-light);
@@ -212,6 +217,6 @@
 
 .panel-description.expanded {
     display: block;
-    max-height: 200px;
-    overflow-y: auto;
+    max-height: none;  /* 制限を解除 */
+    overflow-y: visible;
 }
