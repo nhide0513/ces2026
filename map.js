@@ -529,21 +529,22 @@ function renderPanel() {
             </div>
     `;
     
-    if (description) {
+if (description) {
+    html += `
+        <div class="panel-description ${!showFullDescription ? 'collapsed' : 'expanded'}" id="panelDesc${currentIndex}">
+            ${escapeHtmlPanel(description)}
+        </div>
+    `;
+    
+    if (description.length > 50) {
         html += `
-            <div class="panel-description ${needsTruncate && !showFullDescription ? 'truncated' : ''}">
-                ${escapeHtmlPanel(displayDescription)}
-            </div>
+            <button class="expand-desc-button" onclick="togglePanelDescription()">
+                ${showFullDescription ? '詳細を閉じる ▲' : '詳細を見る ▼'}
+            </button>
         `;
-        
-        if (needsTruncate) {
-            html += `
-                <button class="panel-show-more" onclick="togglePanelDescription()">
-                    ${showFullDescription ? '...閉じる' : '...もっと見る'}
-                </button>
-            `;
-        }
     }
+}
+
     
     html += `</div>`;
     
