@@ -716,18 +716,4 @@ function initMapSwitcher() {
 console.log('✓ map.js v1.7 読み込み完了');
 
 
-// 説明文の展開/折りたたみ
-function togglePanelDescription(index) {
-    const desc = document.getElementById('panelDesc' + index);
-    const btn = event.target;
-    
-    if (desc.classList.contains('collapsed')) {
-        desc.classList.remove('collapsed');
-        desc.classList.add('expanded');
-        btn.textContent = '詳細を閉じる ▲';
-    } else {
-        desc.classList.add('collapsed');
-        desc.classList.remove('expanded');
-        btn.textContent = '詳細を見る ▼';
-    }
-}
+
