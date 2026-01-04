@@ -127,6 +127,9 @@ function initMap() {
         return;
     }
     
+    // 地図の表示範囲を設定
+    map.fitBounds(bounds);
+    
     console.log('✓ 地図初期化完了');
 }
 
